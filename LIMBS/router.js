@@ -4,7 +4,9 @@
  */
 var path = require('path');
 var querystring = require('querystring');
+
 var mysql = require('../shared/node_modules/mysql');
+var xlsx = require('../shared/node_modules/xlsx');
 
 var router_lib = require('../shared/router_lib');
 
@@ -12,12 +14,11 @@ var db_connected = false;
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "password", // I am a master of security
-    //database: "sakila"
+    password: "password" // I am a master of security
 });
 con.connect(function(err) {
     if (err) {
-        console.log(err);
+        console.error(err);
     }
     else {
         db_connected = true;
@@ -45,7 +46,7 @@ module.exports = function(req, res) {
             res.end();
             return true;
         }
-        var q = querystring.parse(req_url.search.slice(1)).query;
+        var q = querystring.parse(req_url.search.slice(1)).query;  //Should probably check both GET and POST requests
         if (!q) {
             res.writeHead(400, "No SQL query supplied");
             res.end();
