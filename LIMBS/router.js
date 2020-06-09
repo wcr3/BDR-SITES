@@ -2,11 +2,9 @@
  * Routing Module for LIMBS to be used with the modular routing system
  * @module limbs_router
  */
-var url = require('url');
 var path = require('path');
-var mysql = require('mysql');
-var events = require('events');
 var querystring = require('querystring');
+var mysql = require('../shared/node_modules/mysql');
 
 var router_lib = require('../shared/router_lib');
 
