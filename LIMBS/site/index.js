@@ -44,7 +44,7 @@ function build_item_table(objs, id, keys) {
         row.onclick = item_modal(obj.item_id);
         keys.forEach((key) => {
             cell = document.createElement('td');
-            cell.innerHTML = obj.key;
+            cell.innerHTML = obj[key];
             row.appendChild(cell);
         });
         table.appendChild(row);
@@ -63,10 +63,17 @@ function item_modal(id) {
             var data = await exec_query('SELECT * FROM bdr_limbs.items WHERE item_id = ' + id);
             var modal = make_modal('');
             var el = document.createElement('h1');
-            el.innerHTML = data.item_name;
+            el.innerHTML = data[0]['item_name'];
             modal.appendChild(el);
             el = document.createElement('h2');
-            el.innerHTML = data.part_number; 
+            el.innerHTML = data[0]['part_number'];
+            if (data[0]['item_link']) {
+                var new_el = document.createElement('a');
+                new_el.setAttribute('href', data[0]['item_link']);
+                new_el.setAttribute('target', '_blank');
+                new_el.appendChild(el);
+                el = new_el;                
+            }
             modal.appendChild(el);
         }
         catch (err) {
