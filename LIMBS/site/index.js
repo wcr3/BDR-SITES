@@ -1,4 +1,4 @@
-import {make_modal} from './shared.js'
+import {expand_popup} from './shared.js'
 
 /**
  * Makes a request to perform a SQL query and returns a Promise which settles when the request completes/fails
@@ -24,12 +24,12 @@ function exec_query(query) {
 }
 
 /**
- * Builds a table of items and sets it as a child to the given <div>
+ * Builds a table of items and returns the table element
  * @param {Array.<Object>} objs - The data to put on the table
- * @param {string} id - The id of the <div>
  * @param {Array.<string>} keys - An array of keys corresponding to the columns of the table
+ * @return The table Element
  */
-function build_item_table(objs, id, keys) {
+function build_item_table(objs, keys) {
     var table = document.createElement('table');
     var row = document.createElement('tr');;
     var cell;
@@ -41,7 +41,7 @@ function build_item_table(objs, id, keys) {
     table.appendChild(row);
     objs.forEach((obj) => {
         row = document.createElement('tr');
-        row.onclick = item_modal(obj.item_id);
+        row.onclick = item_popup(obj.item_id);
         keys.forEach((key) => {
             cell = document.createElement('td');
             cell.innerHTML = obj[key];
@@ -49,22 +49,23 @@ function build_item_table(objs, id, keys) {
         });
         table.appendChild(row);
     });
-    document.getElementById(id).appendChild(table);
+    return table;
 }
 
 /**
- * Generates a callback function to create a modal popup with info about the item with the given id
+ * Generates a callback function to create a popup with info about the item with the given id
  * @param {number} id - The item_id of the item to report
- * @returns {function} The callback function to generate the modal
+ * @returns {function} The callback function to generate the popup
  */
-function item_modal(id) {
+function item_popup(id) {
     return async function() {
         try {
             var data = await exec_query('SELECT * FROM bdr_limbs.items WHERE item_id = ' + id);
-            var modal = make_modal('');
+            var popup = expand_popup(this, document.getElementById('item_tbl'));
+            popup.classList.add('table_popup');
             var el = document.createElement('h1');
             el.innerHTML = data[0]['item_name'];
-            modal.appendChild(el);
+            popup.appendChild(el);
             el = document.createElement('h2');
             el.innerHTML = data[0]['part_number'];
             if (data[0]['item_link']) {
@@ -74,7 +75,7 @@ function item_modal(id) {
                 new_el.appendChild(el);
                 el = new_el;                
             }
-            modal.appendChild(el);
+            popup.appendChild(el);
         }
         catch (err) {
             console.error(err);
@@ -85,7 +86,7 @@ function item_modal(id) {
 
 window.onload = async function() {
     try {
-        build_item_table(await exec_query('SELECT * FROM bdr_limbs.items'), 'item_tbl', ['item_name', 'part_number', 'item_link']);
+        document.getElementById('item_tbl').appendChild(build_item_table(await exec_query('SELECT * FROM bdr_limbs.items'), ['item_name', 'part_number', 'item_link']));
     }
     catch (err) {
         console.error(err);

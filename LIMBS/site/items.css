@@ -1,0 +1,9 @@
+#item_tbl {
+    position: relative;
+    /*overflow: hidden;
+    border-radius: 5px;*/
+}
+
+.table_popup {
+    padding: 10px;
+}
