@@ -54,17 +54,20 @@ export function make_modal() {
  */
 export function expand_popup(source, parent) {
     var background = document.createElement('div');
-    background.className = 'popup_background';
+    background.classList.add('popup_background');
     var popup = document.createElement('div');
-    popup.className = 'popup';
+    popup.classList.add('popup');
     var popup_contents = document.createElement('div');
+    popup_contents.classList.add('popup_contents');
 
     var rect = source.getBoundingClientRect();
     var parent_rect = parent.getBoundingClientRect();
     var top = window.getComputedStyle(parent).position !== 'static' ? (rect.top + window.scrollY - parent_rect.top) : (rect.top + window.scrollY);
     var left = window.getComputedStyle(parent).position !== 'static' ? (rect.left + window.scrollX - parent_rect.left) : (rect.left + window.scrollX);
     var border = window.getComputedStyle(source).borderRadius;
-    popup.style.cssText = '--source_width: ' + rect.width + 'px; --source_height: ' + rect.height + 'px; --source_top: ' + top + 'px; --source_left: ' + left + 'px; --source-br: ' + border + ';';
+    var color = window.getComputedStyle(source).backgroundColor;
+    popup.style.cssText = '--source_width: ' + rect.width + 'px; --source_height: ' +
+                            rect.height + 'px; --source_top: ' + top + 'px; --source_left: ' + left + 'px; --source-br: ' + border + '; --source_bc: ' + color + ';';
     
     background.appendChild(popup);
     parent.appendChild(background);
@@ -75,6 +78,15 @@ export function expand_popup(source, parent) {
             onclick_func(event);
         }
         if (event.target === background) {
+            rect = source.getBoundingClientRect();
+            parent_rect = parent.getBoundingClientRect();
+            top = window.getComputedStyle(parent).position !== 'static' ? (rect.top + window.scrollY - parent_rect.top) : (rect.top + window.scrollY);
+            left = window.getComputedStyle(parent).position !== 'static' ? (rect.left + window.scrollX - parent_rect.left) : (rect.left + window.scrollX);
+            border = window.getComputedStyle(source).borderRadius;
+            color = window.getComputedStyle(source).backgroundColor;
+            popup.style.cssText = '--source_width: ' + rect.width + 'px; --source_height: ' +
+                            rect.height + 'px; --source_top: ' + top + 'px; --source_left: ' + left + 'px; --source-br: ' + border + '; --source_bc: ' + color + ';';
+
             popup.style.minHeight = null;
             popup.style.height = null;
             popup.removeChild(popup_contents);
@@ -95,7 +107,7 @@ export function expand_popup(source, parent) {
             popup.appendChild(popup_contents);
         }
     };
-    async_timeout(100).then(() => {popup.classList.add('expand');});
+    async_timeout(20).then(() => {popup.classList.add('expand');});
 
     return popup_contents;
 }
