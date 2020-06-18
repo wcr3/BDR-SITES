@@ -17,11 +17,13 @@
         </form>
         <h2>Add a Cabinet, Shelf, Table, or Floor</h2>
         -->
-        <form action="/submit" method="POST">
-            <label for="sheet_submit">Select spreadsheet for submission:</label>
-            <input type="file" id="sheet_submit" name="sheet_submit">
-            <input type="submit" value="Upload">
-        </form>
+        <div>
+            <form id="sheet_submit_form">
+                <label for="sheet_submit">Select spreadsheet for submission:</label>
+                <input type="file" id="sheet_submit" name="sheet_submit" accept=".xls,.xlsx,.xlsm,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv,text/csv">
+                <input type="submit" value="Upload">
+            </form>
+        </div>
         <h2>Database</h2>
         <div id="item_tbl"></div> 
     </body>

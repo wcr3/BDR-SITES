@@ -60,3 +60,17 @@ module.exports.get_file = function(f_path) {
     }
     return ret;
 };
+
+/**
+ * Writes a stream into a string via a promise that resolves upon stream end
+ * @param {import('stream').Readable} stream - The stream to read from
+ * @returns {Promise} The promise that resolves to the string
+ */
+module.exports.stream_to_string = function(stream) {
+    var chunks = [];
+    return new Promise((resolve, reject) => {
+        stream.on('data', (chunk) => {chunks.push(chunk)});
+        stream.on('error', reject);
+        stream.on('end', () => {resolve(Buffer.concat(chunks).toString('utf8'))});
+    });
+}

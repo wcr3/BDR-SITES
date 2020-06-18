@@ -9,6 +9,7 @@ var mysql = require('../shared/node_modules/mysql');
 var xlsx = require('../shared/node_modules/xlsx');
 
 var router_lib = require('../shared/router_lib');
+const { read } = require('fs');
 
 var db_connected = false;
 var con = mysql.createConnection({
@@ -24,6 +25,25 @@ con.connect(function(err) {
         db_connected = true;
     }
 });
+
+/**
+ * Performs a SQL Query and send the results as JSON to the given response
+ * @param {string} q - The SQL query to perform
+ * @param {import('http').ServerResponse} res - The response to which the JSON should be sent
+ */
+function sql_send_json(q, res) {
+    con.query(q, function(err, results) {
+        if (err) {
+            console.log(err);
+            res.writeHead(500, "SQL Query Failed.");
+            res.end();
+        }
+        else {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(results));
+        }
+    });
+}
 
 /**
  * A function to handle routing for LIMBS
@@ -46,23 +66,18 @@ module.exports = function(req, res) {
             res.end();
             return true;
         }
-        var q = querystring.parse(req_url.search.slice(1)).query;  //Should probably check both GET and POST requests
-        if (!q) {
-            res.writeHead(400, "No SQL query supplied");
-            res.end();
-            return true;
+        if (req.method === 'POST') {
+            router_lib.stream_to_string(req).then((q) => {sql_send_json(q, res)});
         }
-        con.query(q, function(err, results) {
-            if (err) {
-                console.log(err);
-                res.writeHead(500, "SQL Query Failed.");
+        else if (req.method === 'GET') {
+            var q = querystring.parse(req_url.search.slice(1)).query;
+            if (!q) {
+                res.writeHead(400, "No SQL query supplied");
                 res.end();
+                return true;
             }
-            else {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(results));
-            }
-        });
+            sql_send_json(q, res);
+        }
         return true;
     }
     else if (path.extname(req_url.pathname) !== '') {

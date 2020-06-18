@@ -1,25 +1,52 @@
 import {expand_popup} from './shared.js'
+
 /**
  * Makes a request to perform a SQL query and returns a Promise which settles when the request completes/fails
  * @param {string} query - The SQL query to execute
  * @returns {Promise} A Promise which resolves to the returned data or rejects with returned status text
  */
-function exec_query(query) {
-    return new Promise((resolve, reject) => {
-        var sql_req = new XMLHttpRequest();
-        sql_req.onreadystatechange = function() {
-            if (this.readyState === XMLHttpRequest.DONE) {
-                if (this.status === 200 && this.getResponseHeader('Content-Type') === 'application/json') {
-                    resolve(JSON.parse(this.responseText));
-                } 
-                else {
-                    reject(Error(this.statusText));
-                }
-            }
-        };
-        sql_req.open('GET', window.location.protocol + '//' + window.location.host + '/query?query=' + encodeURIComponent(query));
-        sql_req.send();
+async function exec_query(query) {
+   var response = await fetch(window.location.protocol + '//' + window.location.host + '/query', {
+       method: 'POST',
+       body: query
+   });
+   if (!response.ok) {
+       throw Error(response.status + ': ' + response.statusText);
+   }
+   else if (!(response.headers.get('Content-Type') === 'application/json')) {
+       throw Error('Unexpected Server Response from Query');
+   }
+   return response.json();
+}
+
+/**
+ * Submits a spreadsheet to the server for adding to the database
+ * @param {FormData} form_data - The form data to submit, containing the file
+ * @param {HTMLElement} response_el - The Element in which to put the response text
+ * @param {HTMLDivElement} item_tbl_div - The div which contains the item table
+ */
+async function submit_sheet(form_data, response_el, item_tbl_div) {
+    var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit/items', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'mutlipart/form-data'
+        },
+        body: form_data
     });
+    var el = document.createElement('p');
+    if (response.ok) {
+        el.innerText = 'Successfully Submitted Spreadsheet'
+    }
+    else {
+        el.innerText = 'Submission Failed, ' + response.status + ': ' + response.statusText;
+        el.style.color = '#CF6679';
+    }
+    response_el.appendChild(el);
+    if (item_tbl_div.querySelector('table')) {
+        item_tbl_div.removeChild(item_tbl_div.querySelector('table'));
+    }
+    item_tbl_div.appendChild(build_table(await exec_query('SELECT * FROM bdr_limbs.items'), 
+                                                                        ['item_name', 'part_number', 'item_link'], 'item_id', item_popup));
 }
 
 /**
@@ -81,9 +108,8 @@ async function build_popup(data, popup) {
     popup.append(header);
 
     var form = document.createElement('form');
-    var tag_data = await exec_query('SELECT t.tag_name FROM bdr_limbs.tags as t \
-                                     JOIN bdr_limbs.item_tags as i_t ON t.tag_id = i_t.tag_id \
-                                     WHERE i_t.item_id = ' + data['item_id']);
+    var qry = 'SELECT t.tag_name FROM bdr_limbs.tags as t JOIN bdr_limbs.item_tags as i_t ON t.tag_id = i_t.tag_id WHERE i_t.item_id = ' + data['item_id'];
+    var tag_data = await exec_query(qry);
     var tag_string = tag_data.map((tag_obj) => {return tag_obj['tag_name']}).toString();
     tag_string = tag_string.substring(1, tag_string.length - 1);
     form.setAttribute('action', '');  // TO BE SET
@@ -94,10 +120,8 @@ async function build_popup(data, popup) {
     popup.appendChild(el);
 
     el = document.createElement('div');
-    var loc_table = build_table(await exec_query('SELECT l.location_name, q.quantity FROM bdr_limbs.quantities as q \
-                                                  JOIN bdr_limbs.locations as l ON q.location_id = l.location_id \
-                                                  WHERE q.item_id = ' + data['item_id']), 
-                                                                                        ['location_name', 'quantity']);
+    qry = 'SELECT l.location_name, q.quantity FROM bdr_limbs.quantities as q JOIN bdr_limbs.locations as l ON q.location_id = l.location_id WHERE q.item_id = ' + data['item_id'];
+    var loc_table = build_table(await exec_query(qry), ['location_name', 'quantity']);
     loc_table.classList.add('loc_table');
     el.appendChild(loc_table);
     el.style.gridRow = 'span 2';
@@ -138,8 +162,13 @@ function item_popup(id) {
 
 window.onload = async function() {
     try {
-        document.getElementById('item_tbl').appendChild(build_table(await exec_query('SELECT * FROM bdr_limbs.items'), 
+        var item_tbl_div = document.querySelector('#item_tbl');
+        item_tbl_div.appendChild(build_table(await exec_query('SELECT * FROM bdr_limbs.items'), 
                                                                             ['item_name', 'part_number', 'item_link'], 'item_id', item_popup));
+        document.querySelector('#sheet_submit_form').onsubmit = function(event) {
+            event.preventDefault();
+            submit_sheet(new FormData(this), this.parentElement, item_tbl_div);
+        };
     }
     catch (err) {
         console.error(err);
