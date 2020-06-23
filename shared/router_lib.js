@@ -55,7 +55,7 @@ module.exports.get_file = function(f_path) {
         fs.accessSync(f_path, fs.constants.R_OK);
         ret = fs.createReadStream(f_path);
     } catch (err) {
-        console.log(err);
+        console.error(err);
         ret = null;
     }
     return ret;

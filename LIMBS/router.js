@@ -7,6 +7,7 @@ var querystring = require('querystring');
 
 var mysql = require('../shared/node_modules/mysql');
 var xlsx = require('../shared/node_modules/xlsx');
+var formidable = require('../shared/node_modules/formidable');
 
 var router_lib = require('../shared/router_lib');
 const { read } = require('fs');
@@ -27,22 +28,38 @@ con.connect(function(err) {
 });
 
 /**
+ * A Promise-based wrapper for sql queries
+ * @param {string} q - The query string
+ * @returns {Promise} A promise with resolves to the results of the query
+ */
+function async_query(q) {
+    return new Promise((resolve, reject) => {
+        con.query(q, (err, results) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+/**
  * Performs a SQL Query and send the results as JSON to the given response
  * @param {string} q - The SQL query to perform
  * @param {import('http').ServerResponse} res - The response to which the JSON should be sent
  */
-function sql_send_json(q, res) {
-    con.query(q, function(err, results) {
-        if (err) {
-            console.log(err);
-            res.writeHead(500, "SQL Query Failed.");
-            res.end();
-        }
-        else {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify(results));
-        }
-    });
+async function sql_send_json(q, res) {
+    try {
+        var results = await async_query(q);
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(results));
+    } catch (err) {
+        console.error(err);
+        res.writeHead(500, "SQL Query Failed.");
+        res.end();
+    }
 }
 
 /**
@@ -78,6 +95,46 @@ module.exports = function(req, res) {
             }
             sql_send_json(q, res);
         }
+        return true;
+    }
+    else if ((req_url.pathname.split('/')[1]) === 'submit') {  // Need to implement item and supplier submission
+        var form = new formidable.IncomingForm();
+        form.parse(req, function(err, fields, files) {
+            var wb_file = files[Object.keys(files)[0]];
+            var wb = xlsx.readFile(wb_file.path);
+            var sheet = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            var to_check = [];
+            sheet.forEach(async (item_data) => {
+                try {
+                    var results = await async_query('SELECT * FROM bdr_limbs.items WHERE item_name = \'' + item_data['name'] + '\'');
+                    if (results.length > 0) {
+                        to_check.push(item_data);
+                        return;
+                    }
+                    var supplier = await async_query('SELECT supplier_id FROM bdr_limbs.suppliers WHERE supplier_name = \'' + item_data['supplier'] + '\'');
+                    if (supplier.length > 1 || supplier.length == 0) {
+                        var err = supplier.length > 1 ? new Error('Supplier ' + item_data['supplier'] + ' is not unique') : new Error('No supplier with name ' + item_data['supplier']);
+                        throw err;
+                    }
+                    await async_query('INSERT INTO bdr_limbs.items (item_name, supplier_id, part_number, item_link) VALUES ( \'' + item_data['name'] + '\', ' + supplier[0] + ', \'' + item_data['number'] + '\', \'' + item_data['link'] + '\')');
+                }
+                catch (err) {
+                    console.error(err);
+                    var check;
+                    check = Object.assign(item_data, check);
+                    check.error = err;
+                    to_check.push(check);
+                }
+            });
+            if (to_check.length > 0) {
+                res.writeHead(100, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(to_check));
+            }
+            else {
+                res.writeHead(200);
+                res.end();
+            }
+        });
         return true;
     }
     else if (path.extname(req_url.pathname) !== '') {

@@ -28,13 +28,10 @@ async function exec_query(query) {
 async function submit_sheet(form_data, response_el, item_tbl_div) {
     var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit/items', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'mutlipart/form-data'
-        },
         body: form_data
     });
     var el = document.createElement('p');
-    if (response.ok) {
+    if (response.ok) {  // Need to check if some objects were returned for double-checking
         el.innerText = 'Successfully Submitted Spreadsheet'
     }
     else {
