@@ -30,13 +30,19 @@ con.connect(function(err) {
 /**
  * A Promise-based wrapper for sql queries
  * @param {string} q - The query string
- * @returns {Promise} A promise with resolves to the results of the query
+ * @returns {Promise<Array<Object>>} A promise which resolves to the results of the query
  */
 function async_query(q) {
+    if (!q || q === '') {
+        return new Promise((resolve, reject) => {
+            reject(new Error('400 No SQL query supplied.'));
+        });
+    }
     return new Promise((resolve, reject) => {
         con.query(q, (err, results) => {
             if (err) {
-                reject(err);
+                console.error(err);
+                reject (new Error('500 SQL query failed.'))
             }
             else {
                 resolve(results);
@@ -46,56 +52,32 @@ function async_query(q) {
 }
 
 /**
- * Performs a SQL Query and send the results as JSON to the given response
- * @param {string} q - The SQL query to perform
- * @param {import('http').ServerResponse} res - The response to which the JSON should be sent
- */
-async function sql_send_json(q, res) {
-    try {
-        var results = await async_query(q);
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify(results));
-    } catch (err) {
-        console.error(err);
-        res.writeHead(500, "SQL Query Failed.");
-        res.end();
-    }
-}
-
-/**
  * A function to handle routing for LIMBS
  * @param {import('http').IncomingMessage} req - The request made to the server
  * @param {import('http').ServerResponse} res - The server response
- * @returns {boolean} Whether the response was completed
+ * @returns {Promise} Resolves on a successful route.  Rejects otherwise.
  */
-module.exports = function(req, res) {
-    var f_stream;
+module.exports = async function(req, res) {
     var req_url = new URL(req.url, 'http://' + req.headers.host);
     if (req_url.pathname === '/') {
-        if (f_stream = router_lib.get_file(path.join(__dirname, 'site', 'index.html'))) {
-            router_lib.send_success(res, f_stream, router_lib.HTTP_CONT_TYPE['.html']);
-            return true;
-        }
+        var index_file = await router_lib.get_file(path.join(__dirname, 'site', 'index.html'));
+        await router_lib.send_success(await router_lib.read_file(index_file), router_lib.HTTP_CONT_TYPE['.html'], res);
+        index_file.close();
+        return;
     }
     else if ((req_url.pathname.split('/')[1]) === 'query') {
         if (!db_connected) {
-            res.writeHead(500, "SQL Database not connected.");
-            res.end();
-            return true;
+            throw new Error('500 SQL Database not connected.')
         }
+        var q;
         if (req.method === 'POST') {
-            router_lib.stream_to_string(req).then((q) => {sql_send_json(q, res)});
+            q = await router_lib.stream_to_string(req);
         }
         else if (req.method === 'GET') {
-            var q = querystring.parse(req_url.search.slice(1)).query;
-            if (!q) {
-                res.writeHead(400, "No SQL query supplied");
-                res.end();
-                return true;
-            }
-            sql_send_json(q, res);
+            q = querystring.parse(req_url.search.slice(1)).query;
         }
-        return true;
+        await router_lib.send_success(JSON.stringify(await async_query(q)), router_lib.HTTP_CONT_TYPE['.json'], res);
+        return;
     }
     else if ((req_url.pathname.split('/')[1]) === 'submit') {  // Need to implement item and supplier submission
         var form = new formidable.IncomingForm();
@@ -135,14 +117,18 @@ module.exports = function(req, res) {
                 res.end();
             }
         });
-        return true;
+        return;
     }
     else if (path.extname(req_url.pathname) !== '') {
-        if ((f_stream = router_lib.get_file(path.join(__dirname, 'site', req_url.pathname))) || 
-                (f_stream = router_lib.get_file(path.resolve(path.join(__dirname, '..', 'shared', 'assets', req_url.pathname))))) {
-            router_lib.send_success(res, f_stream, router_lib.HTTP_CONT_TYPE[path.extname(req_url.pathname)]);
-            return true;
+        var file;
+        try {
+            file = await router_lib.get_file(path.join(__dirname, 'site', req_url.pathname));
+        } catch (err) {
+            file = await router_lib.get_file(path.resolve(path.join(__dirname, '..', 'shared', 'assets', req_url.pathname)));
         }
+        await router_lib.send_success(await router_lib.read_file(file), router_lib.HTTP_CONT_TYPE[path.extname(req_url.pathname)], res);
+        file.close();
+        return;
     }
-    return false;
+    throw new Error('404 LIMBS failed to route.');
 };
