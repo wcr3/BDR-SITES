@@ -1,11 +1,13 @@
-import {expand_popup} from './shared.js'
+import {unique_id, expand_popup} from './shared.js'
+
+var current_comms = [];
 
 /**
  * Makes a request to perform a SQL query and returns a Promise which settles when the request completes/fails
  * @param {string} query - The SQL query to execute
  * @returns {Promise} A Promise which resolves to the returned data or rejects with returned status text
  */
-async function exec_query(query) {
+async function exec_query(query) {  // I think I should abstract this out so SQL queries are only written on the server side
    var response = await fetch(window.location.protocol + '//' + window.location.host + '/query', {
        method: 'POST',
        body: query
@@ -17,6 +19,31 @@ async function exec_query(query) {
        throw Error('Unexpected Server Response from Query');
    }
    return response.json();
+}
+
+/**
+ * Submits data to the server for addition to the database.  Includes functionality for confimation
+ * @param {string} table - The table where the data should be added
+ * @param {Array<Object>} data - An array of objects to add
+ * @returns{Promise} Resolves on submission completion.  Rejects if server errors
+ */
+async function submit_data(table, data) {
+    var id = unique_id(current_comms);  // Maybe this should be assigned by the server
+    current_comms.push(id);
+    var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit', {
+        method: 'POST',
+        body: JSON.stringify({
+            comm_id: id,
+            table: table,
+            data: data
+        })
+    });
+    if (response.status === 100) {
+        // Need to implement confirm ('double check')
+    }
+    if (response.status !== 200) {
+        throw new Error('Submission Failed');
+    }
 }
 
 /**
@@ -138,7 +165,7 @@ function item_popup(id) {
     return async function() {
         try {
             var data = await exec_query('SELECT * FROM bdr_limbs.items WHERE item_id = ' + id);
-            var popup = expand_popup(this, document.getElementById('item_tbl'));
+            var popup = await expand_popup(this, document.getElementById('item_tbl'));
 
             if (data.length > 1 || data.length == 0) {
                 popup.classList.add('error_popup')

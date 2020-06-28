@@ -4,6 +4,18 @@
  */
 
 /**
+ * Makes an id which is unique from all others in current_ids - caller must add the new id to the array
+ * @param {Array<string>} current_ids - The list containing other ids
+ * @returns {string} The new id
+ */
+export function unique_id(current_ids) {
+    do {
+        var new_id = Math.random().toString(36).substr(2,9);
+    } while (current_ids.includes(new_id));
+    return new_id;
+}
+
+/**
  * Builds a header bar with links to each site
  * @returns The html text for the header.
  */
@@ -50,9 +62,9 @@ export function make_modal() {
  * Expands a popup window from the location of source to cover parent
  * @param {HTMLElement} source - The source element for the popup, defining it's initial box
  * @param {HTMLElement} parent - The parent, defining the space it grows to cover
- * @returns {HTMLElement} The popup Element created
+ * @returns {Promise<HTMLElement>} Resolves to the popup Element created after it finishes expanding
  */
-export function expand_popup(source, parent) {
+export async function expand_popup(source, parent) {
     var background = document.createElement('div');
     background.classList.add('popup_background');
     var popup = document.createElement('div');
@@ -69,6 +81,7 @@ export function expand_popup(source, parent) {
     popup.style.cssText = '--source_width: ' + rect.width + 'px; --source_height: ' +
                             rect.height + 'px; --source_top: ' + top + 'px; --source_left: ' + left + 'px; --source-br: ' + border + '; --source_bc: ' + color + ';';
     
+    popup.appendChild(popup_contents);
     background.appendChild(popup);
     parent.appendChild(background);
 
@@ -100,14 +113,18 @@ export function expand_popup(source, parent) {
         }
     };
 
-    popup.ontransitionend = (event) => {
-        if (event.propertyName === 'width') {
-            popup.style.minHeight = '90%';
-            popup.style.height = 'auto';
-            popup.appendChild(popup_contents);
-        }
-    };
-    async_timeout(20).then(() => {popup.classList.add('expand');});
+    var t_promise = new Promise((resolve) => {
+        popup.ontransitionend = (event) => {
+            if (event.propertyName === 'width') {
+                popup.style.minHeight = '90%';
+                popup.style.height = 'auto';
+                resolve();
+            }
+        };
+    });
+    await async_timeout(20);  // Need to await for at least one browser paint (usually 60Hz) to ensure popup appears before expanding
+    popup.classList.add('expand');
+    await t_promise;
 
     return popup_contents;
 }

@@ -10,33 +10,40 @@ var xlsx = require('../shared/node_modules/xlsx');
 var formidable = require('../shared/node_modules/formidable');
 
 var router_lib = require('../shared/router_lib');
-const { read } = require('fs');
 
-var db_connected = false;
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password" // I am a master of security
-});
-con.connect(function(err) {
-    if (err) {
-        console.error(err);
-    }
-    else {
-        db_connected = true;
-    }
-});
+var db_connection = null;
+/**
+ * Connects to the MySQL database
+ * @returns {Promise<import('mysql').Connection>} Resolves to the MySQL Connection
+ */
+function db_connect() {
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "password" // I am a master of security
+    });
+    return new Promise((resolve, reject) => {
+        con.connect(function(err) {
+            if (err) {
+                console.error(err);
+                reject(new Error('500 Failed to create SQL Connection.'));
+            }
+            else {
+                resolve(con);
+            }
+        });
+    });
+}
 
 /**
  * A Promise-based wrapper for sql queries
+ * @param {import('mysql').Connection} con - The Database connection
  * @param {string} q - The query string
  * @returns {Promise<Array<Object>>} A promise which resolves to the results of the query
  */
-function async_query(q) {
+function async_query(con, q) {
     if (!q || q === '') {
-        return new Promise((resolve, reject) => {
-            reject(new Error('400 No SQL query supplied.'));
-        });
+        return Promise.reject(new Error('400 No SQL query supplied.'));
     }
     return new Promise((resolve, reject) => {
         con.query(q, (err, results) => {
@@ -66,8 +73,8 @@ module.exports = async function(req, res) {
         return;
     }
     else if ((req_url.pathname.split('/')[1]) === 'query') {
-        if (!db_connected) {
-            throw new Error('500 SQL Database not connected.')
+        if (!db_connection) {
+            db_connection = await db_connect();
         }
         var q;
         if (req.method === 'POST') {
@@ -76,7 +83,7 @@ module.exports = async function(req, res) {
         else if (req.method === 'GET') {
             q = querystring.parse(req_url.search.slice(1)).query;
         }
-        await router_lib.send_success(JSON.stringify(await async_query(q)), router_lib.HTTP_CONT_TYPE['.json'], res);
+        await router_lib.send_success(JSON.stringify(await async_query(db_connection, q)), router_lib.HTTP_CONT_TYPE['.json'], res);
         return;
     }
     else if ((req_url.pathname.split('/')[1]) === 'submit') {  // Need to implement item and supplier submission
@@ -88,17 +95,17 @@ module.exports = async function(req, res) {
             var to_check = [];
             sheet.forEach(async (item_data) => {
                 try {
-                    var results = await async_query('SELECT * FROM bdr_limbs.items WHERE item_name = \'' + item_data['name'] + '\'');
+                    var results = await async_query(db_connection, 'SELECT * FROM bdr_limbs.items WHERE item_name = \'' + item_data['name'] + '\'');
                     if (results.length > 0) {
                         to_check.push(item_data);
                         return;
                     }
-                    var supplier = await async_query('SELECT supplier_id FROM bdr_limbs.suppliers WHERE supplier_name = \'' + item_data['supplier'] + '\'');
+                    var supplier = await async_query(db_connection, 'SELECT supplier_id FROM bdr_limbs.suppliers WHERE supplier_name = \'' + item_data['supplier'] + '\'');
                     if (supplier.length > 1 || supplier.length == 0) {
                         var err = supplier.length > 1 ? new Error('Supplier ' + item_data['supplier'] + ' is not unique') : new Error('No supplier with name ' + item_data['supplier']);
                         throw err;
                     }
-                    await async_query('INSERT INTO bdr_limbs.items (item_name, supplier_id, part_number, item_link) VALUES ( \'' + item_data['name'] + '\', ' + supplier[0] + ', \'' + item_data['number'] + '\', \'' + item_data['link'] + '\')');
+                    await async_query(db_connection, 'INSERT INTO bdr_limbs.items (item_name, supplier_id, part_number, item_link) VALUES ( \'' + item_data['name'] + '\', ' + supplier[0] + ', \'' + item_data['number'] + '\', \'' + item_data['link'] + '\')');
                 }
                 catch (err) {
                     console.error(err);

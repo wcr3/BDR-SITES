@@ -3,8 +3,6 @@
  * @module shared/router_lib
  */
 var fs_promises = require('fs').promises;
-var path = require('path');
-
 
  /** 
   * Collection of bit values corresponding to HTTP Request Methods 
