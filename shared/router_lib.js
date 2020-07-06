@@ -86,3 +86,15 @@ module.exports.stream_to_string = function(stream) {
         stream.on('end', () => {resolve(Buffer.concat(chunks).toString('utf8'))});
     });
 }
+
+/**
+ * Makes an id which is unique from all others in current_ids - caller must add the new id to the array
+ * @param {Array<string>} current_ids - The list containing other ids
+ * @returns {string} The new id
+ */
+module.exports.unique_id = function(current_ids) {
+    do {
+        var new_id = Math.random().toString(36).substr(2,9);
+    } while (current_ids.includes(new_id));
+    return new_id;
+}

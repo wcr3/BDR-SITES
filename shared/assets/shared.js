@@ -4,18 +4,6 @@
  */
 
 /**
- * Makes an id which is unique from all others in current_ids - caller must add the new id to the array
- * @param {Array<string>} current_ids - The list containing other ids
- * @returns {string} The new id
- */
-export function unique_id(current_ids) {
-    do {
-        var new_id = Math.random().toString(36).substr(2,9);
-    } while (current_ids.includes(new_id));
-    return new_id;
-}
-
-/**
  * Builds a header bar with links to each site
  * @returns The html text for the header.
  */

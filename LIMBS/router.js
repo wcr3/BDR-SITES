@@ -6,10 +6,10 @@ var path = require('path');
 var querystring = require('querystring');
 
 var mysql = require('../shared/node_modules/mysql');
-var xlsx = require('../shared/node_modules/xlsx');
-var formidable = require('../shared/node_modules/formidable');
 
 var router_lib = require('../shared/router_lib');
+
+var current_comms = [];
 
 var db_connection = null;
 /**
@@ -87,43 +87,41 @@ module.exports = async function(req, res) {
         return;
     }
     else if ((req_url.pathname.split('/')[1]) === 'submit') {  // Need to implement item and supplier submission
-        var form = new formidable.IncomingForm();
-        form.parse(req, function(err, fields, files) {
-            var wb_file = files[Object.keys(files)[0]];
-            var wb = xlsx.readFile(wb_file.path);
-            var sheet = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-            var to_check = [];
-            sheet.forEach(async (item_data) => {
-                try {
-                    var results = await async_query(db_connection, 'SELECT * FROM bdr_limbs.items WHERE item_name = \'' + item_data['name'] + '\'');
-                    if (results.length > 0) {
-                        to_check.push(item_data);
-                        return;
-                    }
-                    var supplier = await async_query(db_connection, 'SELECT supplier_id FROM bdr_limbs.suppliers WHERE supplier_name = \'' + item_data['supplier'] + '\'');
-                    if (supplier.length > 1 || supplier.length == 0) {
-                        var err = supplier.length > 1 ? new Error('Supplier ' + item_data['supplier'] + ' is not unique') : new Error('No supplier with name ' + item_data['supplier']);
-                        throw err;
-                    }
-                    await async_query(db_connection, 'INSERT INTO bdr_limbs.items (item_name, supplier_id, part_number, item_link) VALUES ( \'' + item_data['name'] + '\', ' + supplier[0] + ', \'' + item_data['number'] + '\', \'' + item_data['link'] + '\')');
+        var id = router_lib.unique_id(current_comms);  // This should probably not always happen
+        current_comms.push(id);
+
+        var to_check = [];
+        var req_body = JSON.parse(await router_lib.stream_to_string(req));
+        req_body.data.forEach(async (item_data) => {
+            try {
+                var results = await async_query(db_connection, 'SELECT * FROM bdr_limbs.items WHERE item_name = \'' + item_data['name'] + '\'');
+                if (results.length > 0) {
+                    to_check.push(item_data);
+                    return;
                 }
-                catch (err) {
-                    console.error(err);
-                    var check;
-                    check = Object.assign(item_data, check);
-                    check.error = err;
-                    to_check.push(check);
+                var supplier = await async_query(db_connection, 'SELECT supplier_id FROM bdr_limbs.suppliers WHERE supplier_name = \'' + item_data['supplier'] + '\'');
+                if (supplier.length > 1 || supplier.length == 0) {
+                    var err = supplier.length > 1 ? new Error('Supplier ' + item_data['supplier'] + ' is not unique') : new Error('No supplier with name ' + item_data['supplier']);
+                    throw err;
                 }
-            });
-            if (to_check.length > 0) {
-                res.writeHead(100, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(to_check));
+                await async_query(db_connection, 'INSERT INTO bdr_limbs.items (item_name, supplier_id, part_number, item_link) VALUES ( \'' + item_data['name'] + '\', ' + supplier[0] + ', \'' + item_data['number'] + '\', \'' + item_data['link'] + '\')');
             }
-            else {
-                res.writeHead(200);
-                res.end();
+            catch (err) {
+                console.error(err);
+                var check;
+                check = Object.assign(item_data, check);
+                check.error = err;
+                to_check.push(check);
             }
         });
+        if (to_check.length > 0) {
+            res.writeHead(100, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(to_check));
+        }
+        else {
+            res.writeHead(200);
+            res.end();
+        }
         return;
     }
     else if (path.extname(req_url.pathname) !== '') {

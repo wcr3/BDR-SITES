@@ -1,6 +1,4 @@
-import {unique_id, expand_popup} from './shared.js'
-
-var current_comms = [];
+import {expand_popup} from './shared.js'
 
 /**
  * Makes a request to perform a SQL query and returns a Promise which settles when the request completes/fails
@@ -22,25 +20,49 @@ async function exec_query(query) {  // I think I should abstract this out so SQL
 }
 
 /**
+ * Retrieve data from the server out of a given table
+ * At the moment I am unsure if this is the best way to do this
+ * although I'd like to abstract out the SQL from the client somehow
+ * @param {Array<string>} tables - The tables from which to pull the data
+ * @param {Array<Array<string>>} fields - The fields to retrieve from each table
+ * @param {Array<string>} conditions - I have no idea how to implement this
+ * @returns {Promise<Array<Object>>} Resolves to the data returned from the server
+ */
+async function retrieve_data(tables, fields, conditions) {
+    var response = await fetch(window.location.protocol + '//' + window.location.host + '/retrieve', {
+        method: 'POST',
+        body: JSON.stringify({
+            table: tables,
+            fields: fields
+        })
+    });
+    if (!response.ok) {
+        throw Error(response.status + ': ' + response.statusText);
+    }
+    else if (!(response.headers.get('Content-Type') === 'application/json')) {
+        throw Error('Unexpected Server Response from Query');
+    }
+    return response.json();
+}
+
+/**
  * Submits data to the server for addition to the database.  Includes functionality for confimation
  * @param {string} table - The table where the data should be added
  * @param {Array<Object>} data - An array of objects to add
- * @returns{Promise} Resolves on submission completion.  Rejects if server errors
+ * @returns {Promise} Resolves on submission completion.  Rejects if server errors
  */
 async function submit_data(table, data) {
-    var id = unique_id(current_comms);  // Maybe this should be assigned by the server
-    current_comms.push(id);
     var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit', {
         method: 'POST',
         body: JSON.stringify({
-            comm_id: id,
             table: table,
             data: data
         })
     });
     if (response.status === 100) {
         // Need to implement confirm ('double check')
-    }
+        var res = await response.json();
+    } 
     if (response.status !== 200) {
         throw new Error('Submission Failed');
     }
@@ -48,17 +70,30 @@ async function submit_data(table, data) {
 
 /**
  * Submits a spreadsheet to the server for adding to the database
- * @param {FormData} form_data - The form data to submit, containing the file
+ * @param {File} file - The sheet to submit
  * @param {HTMLElement} response_el - The Element in which to put the response text
  * @param {HTMLDivElement} item_tbl_div - The div which contains the item table
  */
-async function submit_sheet(form_data, response_el, item_tbl_div) {
-    var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit/items', {
+async function submit_sheet(file, response_el, item_tbl_div) {
+    var wb = XLSX.read(await file.arrayBuffer(), {type: 'array'});
+    var sheet = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    var response = await fetch(window.location.protocol + '//' + window.location.host + '/submit', {
         method: 'POST',
-        body: form_data
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            table: 'items',
+            data: sheet
+        })
     });
     var el = document.createElement('p');
-    if (response.ok) {  // Need to check if some objects were returned for double-checking
+    if (response.status === 100) {
+        // Need to check if some objects were returned for double-checking
+        // This might need to be a while loop
+        throw new Error('Double Checking not implemented');
+    }
+    else if (response.ok) {
         el.innerText = 'Successfully Submitted Spreadsheet'
     }
     else {
@@ -189,9 +224,9 @@ window.onload = async function() {
         var item_tbl_div = document.querySelector('#item_tbl');
         item_tbl_div.appendChild(build_table(await exec_query('SELECT * FROM bdr_limbs.items'), 
                                                                             ['item_name', 'part_number', 'item_link'], 'item_id', item_popup));
-        document.querySelector('#sheet_submit_form').onsubmit = function(event) {
+        document.querySelector('#sheet_submit_form').onsubmit = async function(event) {
             event.preventDefault();
-            submit_sheet(new FormData(this), this.parentElement, item_tbl_div);
+            submit_sheet(event.target[0].files[0], this.parentElement, item_tbl_div);
         };
     }
     catch (err) {
