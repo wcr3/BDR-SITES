@@ -16,10 +16,14 @@ def index(request):
     return HttpResponse(template.render(context,request))
 
 def items_create_view(request): 
-    form = ItemsForm(request.POST or None)
+    form = ItemsForm(request.POST)
     template = loader.get_template('limbs/formtrial.html')
     if form.is_valid():
-        form.save() 
+        form.save()
+        print("form was saved") 
+    else:
+        print("form was not validated")
+        form = ItemsForm()
     context = {
         'form': form
     }

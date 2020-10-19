@@ -8,14 +8,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
-  <body>
-        <form>
+  <body style = "padding: 20px"></body>
+        <form method = "post">
+            {% csrf_token %}  
+
             <div class="form-group">
+            {{ form.errors }}
+            {{ form.non_field_errors }}
             {{form.as_p}}
-            <input type = 'submit' value = 'Save' /> 
+            <input type = 'submit' value = 'Save' class = "btn-success"/> 
             </div>
         </form>
   </body>
 </html>
-
-   
