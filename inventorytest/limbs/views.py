@@ -29,3 +29,18 @@ def items_create_view(request):
     }
     return HttpResponse(template.render(context,request))
     
+def modal_create_view(request):
+    form = ItemsForm(request.POST)
+    template = loader.get_template('limbs/modaltrial.html')
+    print(request.POST)
+    
+    if form.is_valid():
+        form.save()
+        print("form was saved") 
+    else:
+        print("form was not validated")
+        form = ItemsForm()
+    context = {
+        'form': form
+    }
+    return HttpResponse(template.render(context,request))
