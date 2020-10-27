@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>LIMBS</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"></link>  
-    <link rel="stylesheet2" href="./formtrial.css"></link>  
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"></link>
+    <link rel="stylesheet2" href="./formtrial.css"></link>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
   <body style = "padding: 20px"></body>
@@ -19,7 +19,7 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#delete">
     Delete
     </button>
-  
+
     <!-- Modal -->
      <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="add" aria-hidden="true">
      <div class="modal-dialog" role="document">
@@ -32,7 +32,7 @@
             </div>
             <div class="modal-body">
                 <form method = "post">
-                    {% csrf_token %}  
+                    {% csrf_token %}
                     <div class="form-group">
                     {{ form.errors }}
                     {{ form.non_field_errors }}
@@ -53,7 +53,9 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Supplier ID</th>
+                <th scope="col">Part #</th>
                 <th scope="col">Description</th>
+                <th scope="col">Comment</th>
             </thead>
             <tbody>
                 {% for item in item_list %}
@@ -61,7 +63,9 @@
                         <th scope="row">{{item.id}}</th>
                         <td>{{item.name}}</td>
                         <td>{{item.supplier_id}}</td>
+                        <td>{{item.part_number}}</td>
                         <td>{{item.description}}</td>
+                        <td>{{item.comment}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -85,7 +89,7 @@
                </div>
                <div class="modal-body">
                    <form method = "post">
-                       {% csrf_token %}  
+                       {% csrf_token %}
                        <div class="form-group">
                        {{ form.errors }}
                        {{ form.non_field_errors }}
@@ -111,7 +115,7 @@
                </div>
                <div class="modal-body">
                    <form method = "post">
-                       {% csrf_token %}  
+                       {% csrf_token %}
                        <div class="form-group">
                        {{ form.errors }}
                        {{ form.non_field_errors }}
