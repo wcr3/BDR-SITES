@@ -31,16 +31,20 @@ def items_create_view(request):
     
 def modal_create_view(request):
     form = ItemsForm(request.POST)
+    item_list = Items.objects.order_by('name')
+    print("item list one:\n")
+    print(item_list)
     template = loader.get_template('limbs/modaltrial.html')
     print(request.POST)
-    
     if form.is_valid():
-        form.save()
-        print("form was saved") 
+        t = form.save()
     else:
-        print("form was not validated")
         form = ItemsForm()
+    print("item list two:\n")
+    print(item_list)
     context = {
-        'form': form
+        'form': form,
+        'item_list': item_list 
     }
     return HttpResponse(template.render(context,request))
+

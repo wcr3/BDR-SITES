@@ -38,15 +38,42 @@
                     {{ form.non_field_errors }}
                     {{form.as_p}}
                     </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" value = 'Save' name = "add" class="btn btn-primary">Save changes</button>
+                </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" name = "add" class="btn btn-primary">Save changes</button>
             </div>
         </div>
         </div>
     </div>
+    {% if item_list %}
+        <table class="table table-striped">
+            <thead>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Supplier ID</th>
+                <th scope="col">Description</th>
+            </thead>
+            <tbody>
+                {% for item in item_list %}
+                    <tr>
+                        <th scope="row">{{item.id}}</th>
+                        <td>{{item.name}}</td>
+                        <td>{{item.supplier_id}}</td>
+                        <td>{{item.description}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No items are available.</p>
+    {% endif %}
+
+
+
+
+
     <div class="modal fade" id="update" tabindex="-1" role="dialog" aria-labelledby="update" aria-hidden="true">
         <div class="modal-dialog" role="document">
              <div class="modal-content">
