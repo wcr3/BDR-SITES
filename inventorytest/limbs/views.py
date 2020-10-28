@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 # Create your views here.
 from django.http import HttpResponse
@@ -9,9 +9,11 @@ from .models import Items
 
 def index(request):
     item_list = Items.objects.order_by('name')
+    form = ItemsForm()
     template = loader.get_template('limbs/index.html')
     context = {
-        'item_list': item_list
+        'item_list': item_list,
+        'form': form
     }
     return HttpResponse(template.render(context,request))
 
@@ -44,3 +46,12 @@ def modal_create_view(request):
         'form': form
     }
     return HttpResponse(template.render(context,request))
+
+def delete_view(request, id):
+    item = Items.objects.get(id=id)
+    item.delete()
+    return redirect('/limbs')
+
+def item_create_form(request, id):
+    item = Items.objects.get(id=id)
+    
