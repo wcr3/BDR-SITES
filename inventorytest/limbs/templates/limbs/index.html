@@ -67,24 +67,49 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method = "post">
+                                        <form action="{% url 'update_view' id=item.id %}" method = "post">
                                             {% csrf_token %}
-                                            <!--<div>
-                                                {% for field in form %}
-                                                    {{field.value}} {{field.type}}
-                                                        <input type="name" id={{ field.languages.id_for_label }} value={{ field.languages.value }}/>
-                                                {% endfor %}
-                                            </div> --> 
                                             <div class="form-group">
                                             {{ form.errors }}
                                             {{ form.non_field_errors }}
-                                            {{form.as_p}}
+                                            <div class="fieldWrapper">
+                                                {{ form.name.errors }}
+                                                <p>{{form.name.label_tag}}
+                                                    <input id="name" type="text" name="name" value = {{item.name}} class = "form-control" maxlength="200" width = "50%"></p>
+                                            </div>
+                                            <div class="fieldWrapper">
+                                                {{ form.supplier_id.errors }}
+                                                <p>{{form.supplier_id.label_tag}}
+                                                    <select name="id_supplier" class="form-control" required="" id="id_supplier" selected = {{item.supplier_id}}>
+                                                        <option value="1">Costco</option>
+                                                        <option value="2">Target</option>
+                                                    </select>                                            
+                                            </div>
+                                            <div class="fieldWrapper">
+                                                <p>{{form.part_number.label_tag}}
+                                                    <input id="id_part_number" type="text" name="part_number" value = {{item.part_number}} class = "form-control" maxlength="200" width = "50%"></p>
+                                            </div>
+                                            <div class="fieldWrapper">
+                                                {{ form.name.errors }}
+                                                <p>{{form.url.label_tag}}
+                                                    <input id="id_url" type="text" name="URL" value = {{item.url}} class = "form-control" maxlength="200" width = "50%"></p>
+                                            </div>
+                                            <div class="fieldWrapper">
+                                                {{ form.name.errors }}
+                                                <p> {{form.description.label_tag}}
+                                                    <input id="id_description" type="text" name="description" value = {{item.description}} class = "form-control" maxlength="200" width = "50%"></p>
+                                            </div>
+                                            <div class="fieldWrapper">
+                                                {{ form.name.errors }}
+                                                <p> {{form.comment.label_tag}}
+                                                    <input id="id_comment" type="text" name="comment" value = {{item.comment}} class = "form-control" maxlength="200" width = "50%"></p>
+                                            </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" name = "update" class="btn btn-primary">Save changes</button>
                                             </div>
                                         </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" name = "update" class="btn btn-primary">Save changes</button>
                                     </div>
                                </div>
                             </div>
@@ -137,18 +162,22 @@
                 </button>
                </div>
                <div class="modal-body">
+<<<<<<< HEAD
                    <form action="{% url 'item_create_view' %}" method = "post">
+=======
+                   <form method = "post" action="{% url 'add_view'%}">
+>>>>>>> e741ed506da649cb7756603aed358b5e94cec444
                        {% csrf_token %}  
                        <div class="form-group">
                        {{ form.errors }}
                        {{ form.non_field_errors }}
                        {{form.as_p}}
                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name = "add" class="btn btn-primary">Save changes</button>
+                    </div>
                    </form>
-               </div>
-               <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-               <button type="submit" name = "add" class="btn btn-primary">Save changes</button>
                </div>
             </div>
         </div>

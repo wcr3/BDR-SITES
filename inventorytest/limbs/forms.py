@@ -30,4 +30,10 @@ class ItemsForm(forms.ModelForm):
             'url': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"url", 'width':"50%"}),
             'description': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"description", 'width':"50%"}),
             'comment': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"comment", 'width':"50%"})
+<<<<<<< HEAD
         }
+=======
+        }
+    def __init__(self, *args, **kwargs):
+        super(ItemsForm, self).__init__(*args, **kwargs)
+>>>>>>> e741ed506da649cb7756603aed358b5e94cec444
