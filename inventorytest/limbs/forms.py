@@ -31,8 +31,3 @@ class ItemsForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"description", 'width':"50%"}),
             'comment': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"comment", 'width':"50%"})
         }
-    def __init__(self, *args, **kwargs):
-        super(ItemsForm, self).__init__(*args, **kwargs)
-        self.fields['name'].initial = 'Hello'
-        print(self.fields['name'].initial)
-        #self.fields['name'].initial = 'Bye'

@@ -52,6 +52,5 @@ def delete_view(request, id):
     item.delete()
     return redirect('/limbs')
 
-def item_create_form(request, id):
-    item = Items.objects.get(id=id)
-    
+# def item_create_form(request, id):
+#     item = Items.objects.get(id=id)
