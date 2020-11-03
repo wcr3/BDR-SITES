@@ -39,92 +39,55 @@
        </div>
        <div class="modal fade" id="update" tabindex="-1" role="dialog" aria-labelledby="update" aria-hidden="true">
         <div class="modal-dialog" role="document">
-             <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="exampleModalLabel">Update</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method = "post">
+                        {% csrf_token %}  
+                        <div class="form-group">
+                        {{ form.errors }}
+                        {{ form.non_field_errors }}
+                        {{form.as_p}}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" name = "update" class="btn btn-primary">Save changes</button>
+                </div>
+           </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Update</h5>
+               <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                    <span aria-hidden="true">&times;</span>
                </button>
                </div>
                <div class="modal-body">
                    <form method = "post">
-                       {% csrf_token %}
+                       {% csrf_token %}  
                        <div class="form-group">
                        {{ form.errors }}
                        {{ form.non_field_errors }}
                        {{form.as_p}}
                        </div>
-                       <button type="submit" name = "update" class="btn btn-primary">Save changes</button>
                    </form>
                </div>
                <div class="modal-footer">
                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" name = "delete" class="btn btn-primary">Save changes</button>
                </div>
            </div>
            </div>
     </div>
-    <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
-           <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-                  </div>
-                  <div class="modal-body">
-                      <form method = "post">
-                          {% csrf_token %}
-                          <div class="form-group">
-                          {{ form.errors }}
-                          {{ form.non_field_errors }}
-                          {{form.as_p}}
-                          </div>
-                          <button type="submit" name = "delete" class="btn btn-primary">Save changes</button>
-                      </form>
-                  </div>
-                  <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
-              </div>
-              </div>
-       </div>
-    {% if item_list %}
-        <table class="table table-striped">
-            <thead>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Supplier ID</th>
-                <th scope="col">Part #</th>
-                <th scope="col">Description</th>
-                <th scope="col">Comment</th>
-            </thead>
-            <tbody>
-                {% for item in item_list %}
-                    <tr>
-                        <th scope="row">{{item.id}}</th>
-                        <td>{{item.name}}</td>
-                        <td>{{item.supplier_id}}</td>
-                        <td>{{item.part_number}}</td>
-                        <td>{{item.description}}</td>
-                        <td>{{item.comment}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No items are available.</p>
-    {% endif %}
-
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add">
-     Add
-    </button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update">
-    Update
-    </button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#delete">
-    Delete
-    </button>
   </body>
 </html>

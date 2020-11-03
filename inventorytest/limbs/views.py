@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 from django.shortcuts import (get_object_or_404, 
                               render,  
                               HttpResponseRedirect) 
+=======
+from django.shortcuts import redirect, render
+
+>>>>>>> c576d6a8971341f0de44eaa9ab015c02d8870e7a
 # Create your views here.
 from django.http import HttpResponse
 from django.template import loader
@@ -10,9 +15,11 @@ from .models import Items
 
 def index(request):
     item_list = Items.objects.order_by('name')
+    form = ItemsForm()
     template = loader.get_template('limbs/index.html')
     context = {
-        'item_list': item_list
+        'item_list': item_list,
+        'form': form
     }
     return HttpResponse(template.render(context,request))
 
@@ -53,45 +60,11 @@ def modal_create_view(request):
     }
     return HttpResponse(template.render(context,request))
 
-
 def delete_view(request, id):
-    print("gets here from delete request")
-    if request.method == "DELETE": 
-        try:
-            item = Items.objects.get(name = id)
-        except Item.DoesNotExist: 
-            return redirect('/limbs')
-        item.delete()
-    redirect('/limbs')
+    item = Items.objects.get(id=id)
+    item.delete()
+    return redirect('/limbs')
 
-class MyFormViews: 
-
-    def get(self, request, *args, **kwargs):
-        form = ItemsForm(request.POST)
-        item_list = Items.objects.order_by('name')
-        template = loader.get_template('limbs/modaltrial.html')
-        return HttpResponse(template.render(context,request))
-
-        
-    def post(self, request, *args, **kwargs):
-        form = ItemsForm(request.POST)
-        if 'add' in request.POST:
-            print("gets in to the addition")
-            if form.is_valid():
-                t = form.save()
-            else:
-                form = ItemsForm()
-        elif 'update' in request.POST:
-            print("it should update")
-        elif 'delete' in request.POST:
-            print("it should delete it")
-        context = {}
-        return HttpResponse(template.render(context,request))
-
+def item_create_form(request, id):
+    item = Items.objects.get(id=id)
     
-
-        
-
-
-        
-
