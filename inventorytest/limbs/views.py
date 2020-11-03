@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-from django.shortcuts import (get_object_or_404, 
-                              render,  
-                              HttpResponseRedirect) 
-=======
 from django.shortcuts import redirect, render
 
->>>>>>> c576d6a8971341f0de44eaa9ab015c02d8870e7a
 # Create your views here.
 from django.http import HttpResponse
 from django.template import loader
@@ -59,12 +53,33 @@ def modal_create_view(request):
         'item_list': item_list 
     }
     return HttpResponse(template.render(context,request))
+def add_view(request):
+    form = ItemsForm(request.POST)
+    if form.is_valid():
+        t = form.save()
+    else:
+        print("form is not validated")
+    return redirect('/limbs')
+
+
+
 
 def delete_view(request, id):
     item = Items.objects.get(id=id)
+    print("this is the item") 
+    print(item) 
     item.delete()
     return redirect('/limbs')
 
-def item_create_form(request, id):
+def update_view(request, id):
     item = Items.objects.get(id=id)
+    print("this is the item") 
+    print(item)
+    form = ItemsForm(request.POST, instance = item)   
+    if form.is_valid(): 
+        form.save() 
+    else: 
+        print("form not valid item not updated")
+    return redirect('/limbs')
+
     
