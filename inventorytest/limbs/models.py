@@ -15,7 +15,7 @@ class Items(models.Model):
    name = models.CharField(max_length=200)
    supplier_id = models.ForeignKey(Suppliers, on_delete=models.SET_NULL, null=True)
    part_number = models.CharField(max_length=200)
-   url = models.CharField(max_length=200)
+   url = models.CharField(default=None,max_length=200)
    description = models.CharField(max_length=400)
    comment = models.CharField(max_length=400)
    def __str__(self):
@@ -25,7 +25,6 @@ class Locations(models.Model):
    name = models.CharField(max_length=200)
    parent_id = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
  
-#more relational info
 class Tags(models.Model):
    name = models.CharField(max_length=200)
  

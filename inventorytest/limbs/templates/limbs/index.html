@@ -8,6 +8,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <!--Checks if there is an existing item list.-->
     {% if item_list %}
         <table class="table table-striped">
             <thead>
@@ -15,7 +16,7 @@
                 <th class="text-center" scope="col">Name</th>
                 <th class="text-center" scope="col">Supplier ID</th>
                 <th class="text-center" scope="col">Description</th>
-                <th colspan="2" class="text-center" scope="col">Actions</th>
+                <th colspan="3" class="text-center" scope="col">Actions</th>
             </thead>
             <tbody>
                 {% for item in item_list %}
@@ -24,8 +25,55 @@
                         <td class="text-center">{{item.name}}</td>
                         <td class="text-center">{{item.supplier_id}}</td>
                         <td class="text-center">{{item.description}}</td>
+                        <td class="text-center"><a data-toggle="modal" href="#info{{item.id}}">Info</a></td>
                         <td class="text-center"><a data-toggle="modal" href="#update{{item.id}}">Update</a></td>
                         <td class="text-center"><a data-toggle="modal" href="#delete{{item.id}}">Delete</a></td>
+                        <div class="modal fade" id="info{{item.id}}" tabindex="-1" role="dialog" aria-labelledby="info{{item.id}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="exampleModalLabel">Information</h6>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="modal-body">
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-md-4">Name</div>
+                                                    <div class="col-md-4 ml-auto">{{item.name}}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Supplier ID</div>
+                                                    <div class="col-md-4 ml-auto">{{item.supplier_id}}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Part Number</div>
+                                                    <div class="col-md-4 ml-auto">{{item.part_number}}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">URL</div>
+                                                    <div class="col-md-4 ml-auto">{{item.url}}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Description</div>
+                                                    <div class="col-md-4 ml-auto">{{item.description}}</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">Comment</div>
+                                                    <div class="col-md-4 ml-auto">{{item.comment}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+                        <!--Update Modal-->
                         <div class="modal fade" id="update{{item.id}}" tabindex="-1" role="dialog" aria-labelledby="update{{item.id}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -48,10 +96,15 @@
                                             </div>
                                             <div class="fieldWrapper">
                                                 {{ form.supplier_id.errors }}
-                                                <p>{{form.supplier_id.label_tag}}
-                                                    <select name="id_supplier" class="form-control" required="" id="id_supplier" selected = {{item.supplier_id}}>
-                                                        <option value="1">Costco</option>
-                                                        <option value="2">Target</option>
+                                                {{form.supplier_id.label_tag}}
+                                                    <select name="supplier_id" class="form-control" required="" id="id_supplier">
+                                                        {% for id, name in form.fields.supplier_id.choices %}
+                                                            {% if name == item.supplier_id|stringformat:"s" %}
+                                                                <option value="{{ id }}" selected>{{name}}</option>
+                                                            {% else %}
+                                                                <option value="{{ id }}">{{ name }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
                                                     </select>                                            
                                             </div>
                                             <div class="fieldWrapper">
@@ -59,17 +112,17 @@
                                                     <input id="id_part_number" type="text" name="part_number" value = {{item.part_number}} class = "form-control" maxlength="200" width = "50%"></p>
                                             </div>
                                             <div class="fieldWrapper">
-                                                {{ form.name.errors }}
+                                                {{ form.url.errors }}
                                                 <p>{{form.url.label_tag}}
-                                                    <input id="id_url" type="text" name="URL" value = {{item.url}} class = "form-control" maxlength="200" width = "50%"></p>
+                                                    <input id="id_url" type="text" name="url" value = {{item.url}} class = "form-control" maxlength="200" width = "50%"></p>
                                             </div>
                                             <div class="fieldWrapper">
-                                                {{ form.name.errors }}
+                                                {{ form.description.errors }}
                                                 <p> {{form.description.label_tag}}
                                                     <input id="id_description" type="text" name="description" value = {{item.description}} class = "form-control" maxlength="200" width = "50%"></p>
                                             </div>
                                             <div class="fieldWrapper">
-                                                {{ form.name.errors }}
+                                                {{ form.comment.errors }}
                                                 <p> {{form.comment.label_tag}}
                                                     <input id="id_comment" type="text" name="comment" value = {{item.comment}} class = "form-control" maxlength="200" width = "50%"></p>
                                             </div>
@@ -83,6 +136,7 @@
                                </div>
                             </div>
                         </div>
+                        <!--Delete Modal-->
                         <div class="modal fade" id="delete{{item.id}}" tabindex="-1" role="dialog" aria-labelledby="delete{{item.id}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -102,13 +156,11 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <!--<a href="{% url 'delete_view' id=item.id %}" class="btn btn-primary">Delete</a>-->
                                         <form action="{% url 'delete_view' id=item.id %}" method="POST">
                                             {% csrf_token %}
                                             <button class="btn btn-primary" type="submit">Delete</button>
                                         </form>
                                         <button class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <!--<button type="submit" name="delete" class="btn btn-primary">Save changes</button>-->
                                     </div>
                                </div>
                             </div>
@@ -148,6 +200,4 @@
         </div>
     </div>
   </body>
-</html>
-
-   
+</html> 
