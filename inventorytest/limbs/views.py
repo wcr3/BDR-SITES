@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from django.template import loader
 from .forms import ItemsForm
 from .models import Items
+from django.db.models import Q 
+import json
 
 def index(request):
     item_list = Items.objects.order_by('name')
@@ -37,3 +39,20 @@ def update_view(request, id):
     else: 
         print(form.errors)
     return redirect('/limbs')
+
+def search_view(request):
+    item_list = Items.objects.order_by('name')
+    template = loader.get_template('limbs/search.html')
+    context = {
+        'item_list': item_list
+    }
+    return HttpResponse(template.render(context,request))
+
+def search(request):
+    if request.is_ajax():
+        q = request.GET.get('q')
+        if q is not None:            
+            results = Items.objects.filter(  
+            	Q( name__contains = q ))          
+            return render_to_response('results.html', {'results': results}, 
+                                       context_instance = RequestContext(request))

@@ -26,8 +26,22 @@ class ItemsForm(forms.ModelForm):
                     'class': "form-control",
                     }
                 ),
-            'part_number': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"partnumber", 'width':"50%"}),
-            'url': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"url", 'width':"50%"}),
+            'part_number': forms.TextInput(
+                attrs = {
+                    'class': "form-control", 
+                    'type': "text", 
+                    'placeholder': "partnumber", 
+                    'width':"50%"
+                    }
+                ),
+            'url': forms.TextInput(
+                attrs = {
+                    'class': "form-control",
+                    'type': "text",
+                    'placeholder': "url",
+                    'width':"50%"
+                    }
+                ),
             'description': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"description", 'width':"50%"}),
             'comment': forms.TextInput(attrs={'class':"form-control" , 'type':"text", 'placeholder':"comment", 'width':"50%"})
         }
