@@ -3,11 +3,19 @@
   <head>
     <meta charset="utf-8">
     <title>LIMBS</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"></link>  
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"></link>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <form method = "get">
+      <div class = "form-group">
+      {{item_filter.form}}
+      <button class = "btn btn-primary" type = "submit">
+        Search
+      </button>
+      </div>
+    </form>
     <!--Checks if there is an existing item list.-->
     {% if item_list %}
         <table class="table table-striped">
@@ -105,7 +113,7 @@
                                                                 <option value="{{ id }}">{{ name }}</option>
                                                             {% endif %}
                                                         {% endfor %}
-                                                    </select>                                            
+                                                    </select>
                                             </div>
                                             <div class="fieldWrapper">
                                                 <p>{{form.part_number.label_tag}}
@@ -184,7 +192,7 @@
                </div>
                <div class="modal-body">
                    <form method = "post" action="{% url 'add_view'%}">
-                       {% csrf_token %}  
+                       {% csrf_token %}
                        <div class="form-group">
                        {{ form.errors }}
                        {{ form.non_field_errors }}
@@ -200,4 +208,4 @@
         </div>
     </div>
   </body>
-</html> 
+</html>
