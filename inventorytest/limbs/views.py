@@ -61,9 +61,6 @@ def add_view(request):
         print("form is not validated")
     return redirect('/limbs')
 
-
-
-
 def delete_view(request, id):
     item = Items.objects.get(id=id)
     print("this is the item") 
