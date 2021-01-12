@@ -1,0 +1,98 @@
+{% if item %}
+<div style="grid-column: span 3;">
+    <h1>{{item.name}}</h1>
+    <h2>{{item.manufacturer.name}} - {{item.part_number}}</h2>
+</div>
+<div style="">
+    <table>
+        <tr>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Part Number
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+        {% for supplier_info in item.itemsupplier_set.all %}
+        <tr>
+            <td>
+                {{supplier_info.supplier.name}}
+            </td>
+            <td>
+                <a href="{{supplier_info.link}}" target="_blank">{{supplier_info.supplier_part_number}}</a>
+            </td>
+            <td>
+                ${{supplier_info.cost}}
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>
+                <form id="supplier_form"><input type="text"></form>
+            </td>
+            <td>
+                <input form="supplier_form" type="text"> - <input form="supplier_form" type="url" value="link">
+            </td>
+            <td>
+                <input form="supplier_form" type="number">
+            </td>
+        </tr>
+    </table>
+</div>
+{% else %}
+<h1>Invalid Item ID</h1>
+{% endif %}
+
+<!--
+/**
+ * Builds the item popup
+ * @param {Object} data - The item data from the server
+ * @param {HTMLElement} popup - The popup element in which to build the info
+ */
+async function build_popup(data, popup) {
+    popup.classList.add('table_popup');
+    var header = document.createElement('div');
+    header.style.gridColumn = 'span 2';
+    var el = document.createElement('h1');
+    el.innerHTML = data['item_name'];
+    header.appendChild(el);
+    el = document.createElement('h2');
+    el.innerHTML = data['part_number'];
+    if (data['item_link']) {
+        var new_el = document.createElement('a');
+        new_el.setAttribute('href', data['item_link']);
+        new_el.setAttribute('target', '_blank');
+        new_el.appendChild(el);
+        el = new_el;                
+    }
+    header.appendChild(el);
+    popup.append(header);
+
+    var form = document.createElement('form');
+    var qry = 'SELECT t.tag_name FROM bdr_limbs.tags as t JOIN bdr_limbs.item_tags as i_t ON t.tag_id = i_t.tag_id WHERE i_t.item_id = ' + data['item_id'];
+    var tag_data = await exec_query(qry);
+    var tag_string = tag_data.map((tag_obj) => {return tag_obj['tag_name']}).toString();
+    tag_string = tag_string.substring(1, tag_string.length - 1);
+    form.setAttribute('action', '');  // TO BE SET
+    form.innerHTML = '<label for="tags"><h3 style="display: inline;">Tags: </h3></label><input inline" type="text" name="tags" value="' 
+                                     + tag_string + '">';  // This should probably use a pattern attribute with a RegEx
+    el = document.createElement('div');
+    el.appendChild(form);
+    popup.appendChild(el);
+
+    el = document.createElement('div');
+    qry = 'SELECT l.location_name, q.quantity FROM bdr_limbs.quantities as q JOIN bdr_limbs.locations as l ON q.location_id = l.location_id WHERE q.item_id = ' + data['item_id'];
+    var loc_table = build_table(await exec_query(qry), ['location_name', 'quantity']);
+    loc_table.classList.add('loc_table');
+    el.appendChild(loc_table);
+    el.style.gridRow = 'span 2';
+    popup.appendChild(el);
+
+    el = document.createElement('div');
+    el.innerHTML = 'Grid Element 3';
+    popup.appendChild(el);
+}
+-->
