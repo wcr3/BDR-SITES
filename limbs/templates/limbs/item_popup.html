@@ -1,16 +1,45 @@
 {% if item %}
-<div style="grid-column: span 3;">
-    <h1>{{item.name}}</h1>
-    <h2>{{item.manufacturer.name}} - {{item.part_number}}</h2>
-</div>
-<div style="">
+
+<form action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 1;">
     <table>
+        <tr>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Part Number
+            </th>
+            <th>
+                Manufacturer (name)
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input readonly form="edit_item_form" type="text" name="item_name" value={{item.name}}>
+            </th>
+            <th>
+                <input readonly form="edit_item_form" type="text" name="part_number" value={{item.part_number}}>
+            </th>
+            <th>
+                <input readonly form="edit_item_form" type="text" name="manufacturer_name" value={{item.manufacturer}}>
+            </th>
+        </tr>
+        
+</div>
+
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <table id="supplier_table">
         <tr>
             <th>
                 Supplier
             </th>
             <th>
-                Part Number
+                Supplier Part Number - Link 
             </th>
             <th>
                 Cost
@@ -19,80 +48,42 @@
         {% for supplier_info in item.itemsupplier_set.all %}
         <tr>
             <td>
-                {{supplier_info.supplier.name}}
+                <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value={{supplier_info.supplier}}>
             </td>
             <td>
-                <a href="{{supplier_info.link}}" target="_blank">{{supplier_info.supplier_part_number}}</a>
+                <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value={{supplier_info.supplier_part_number}}> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value={{supplier_info.link}}>
             </td>
             <td>
-                ${{supplier_info.cost}}
+                <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value={{supplier_info.cost}}>
             </td>
         </tr>
         {% endfor %}
+        
+    </table>
+    <button hidden form="edit_item_form" type="button" onclick="addRowSupplier('edit_item_form')">Add</button>
+</div>
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <table id="location_table">
         <tr>
-            <td>
-                <form id="supplier_form"><input type="text"></form>
-            </td>
-            <td>
-                <input form="supplier_form" type="text"> - <input form="supplier_form" type="url" value="link">
-            </td>
-            <td>
-                <input form="supplier_form" type="number">
-            </td>
+            <th>
+                Location
+            </th>
+            <th>
+                Quantity 
+            </th>
         </tr>
     </table>
+    <!-- <button type="button" onclick="insertNewFunction()">Add</button> -->
 </div>
+
+  
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <input  hidden type="submit" form="edit_item_form" name="Edit" value="Save Changes">
+    <input  hidden type="submit" form="edit_item_form" name="Delete" value="Delete Item"> 
+    <button type="button" onclick="editData()">Edit</button>
+</div>
+
 {% else %}
 <h1>Invalid Item ID</h1>
 {% endif %}
-
-<!--
-/**
- * Builds the item popup
- * @param {Object} data - The item data from the server
- * @param {HTMLElement} popup - The popup element in which to build the info
- */
-async function build_popup(data, popup) {
-    popup.classList.add('table_popup');
-    var header = document.createElement('div');
-    header.style.gridColumn = 'span 2';
-    var el = document.createElement('h1');
-    el.innerHTML = data['item_name'];
-    header.appendChild(el);
-    el = document.createElement('h2');
-    el.innerHTML = data['part_number'];
-    if (data['item_link']) {
-        var new_el = document.createElement('a');
-        new_el.setAttribute('href', data['item_link']);
-        new_el.setAttribute('target', '_blank');
-        new_el.appendChild(el);
-        el = new_el;                
-    }
-    header.appendChild(el);
-    popup.append(header);
-
-    var form = document.createElement('form');
-    var qry = 'SELECT t.tag_name FROM bdr_limbs.tags as t JOIN bdr_limbs.item_tags as i_t ON t.tag_id = i_t.tag_id WHERE i_t.item_id = ' + data['item_id'];
-    var tag_data = await exec_query(qry);
-    var tag_string = tag_data.map((tag_obj) => {return tag_obj['tag_name']}).toString();
-    tag_string = tag_string.substring(1, tag_string.length - 1);
-    form.setAttribute('action', '');  // TO BE SET
-    form.innerHTML = '<label for="tags"><h3 style="display: inline;">Tags: </h3></label><input inline" type="text" name="tags" value="' 
-                                     + tag_string + '">';  // This should probably use a pattern attribute with a RegEx
-    el = document.createElement('div');
-    el.appendChild(form);
-    popup.appendChild(el);
-
-    el = document.createElement('div');
-    qry = 'SELECT l.location_name, q.quantity FROM bdr_limbs.quantities as q JOIN bdr_limbs.locations as l ON q.location_id = l.location_id WHERE q.item_id = ' + data['item_id'];
-    var loc_table = build_table(await exec_query(qry), ['location_name', 'quantity']);
-    loc_table.classList.add('loc_table');
-    el.appendChild(loc_table);
-    el.style.gridRow = 'span 2';
-    popup.appendChild(el);
-
-    el = document.createElement('div');
-    el.innerHTML = 'Grid Element 3';
-    popup.appendChild(el);
-}
--->

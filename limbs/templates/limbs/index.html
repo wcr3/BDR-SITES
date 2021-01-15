@@ -27,6 +27,9 @@
 </div>
 -->
 <h2>Database</h2>
+
+<button type="button" onclick="item_popup(event, '{% url 'limbs:create_item' %}')">Create Item</button>
+
 <div id="item_tbl">
     {% include "./item_table.html" with item_list=item_list only %}
 </div>

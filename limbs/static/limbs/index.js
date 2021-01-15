@@ -29,4 +29,48 @@ window.item_popup = async function item_popup(e, path) {
     }
 }
 
+window.editData = function editData() {
+    var form_name = "edit_item_form";
+    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+
+    var elements = document.forms[form_name].elements;
+    for (var i=0; i<elements.length; i++){
+        //ignore this special input
+        if (elements[i].name === "csrfmiddlewaretoken"){
+            continue; 
+        }
+        //remove readonly from input so user can edit
+        if (elements[i].hasAttribute("readonly")){
+            elements[i].removeAttribute("readonly");
+        }
+        //show save changes and delete buttons
+        if (elements[i].hasAttribute("hidden")){
+            elements[i].removeAttribute("hidden");
+        }
+      }
+}
+
+window.addRowSupplier = function addRowSupplier(form_name) {
+
+    var table = document.getElementById("supplier_table");
+    var base_id = table.rows.length;
+   
+    // Create new row
+    var row = table.insertRow(-1);
+
+    //add columns
+    var supplier = row.insertCell(0);
+    var part_no = row.insertCell(1);
+    var cost = row.insertCell(2);
+    
+    //need unique names to we can retrieve data from form 
+    var supp_name = "supplier_name_"+base_id;
+    var partno_name = "supplier_partno_"+base_id;
+    var link_name = "supplier_link_"+base_id;
+    var cost_name = "supplier_cost_"+base_id; 
+
+    supplier.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${supp_name}">`;
+    part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;      
+    cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">`;
+}
 //window.onload = async function() {};

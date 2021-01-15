@@ -1,0 +1,76 @@
+
+<form action="{% url 'limbs:create_item' %}" method="post" id="create_item_form">
+    {% csrf_token %}
+</form>
+
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <table>
+        <tr>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Part Number
+            </th>
+            <th>
+                Manufacturer (name)
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input form="create_item_form" type="text" name="item_name">
+            </th>
+            <th>
+                <input form="create_item_form" type="text" name="part_number">
+            </th>
+            <th>
+                <input form="create_item_form" type="text" name="manufacturer_name">
+            </th>
+        </tr>
+</div>
+
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <table id="supplier_table">
+        <tr>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Supplier Part Number - Link 
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+        
+    </table>
+    <button type="button" onclick="addRowSupplier('create_item_form')">Add</button>
+</div>
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <table id="location_table">
+        <tr>
+            <th>
+                Location
+            </th>
+            <th>
+                Quantity 
+            </th>
+        </tr>
+    </table>
+    <!-- <button type="button" onclick="insertNewFunction()">Add</button> -->
+</div>
+
+
+<div style="grid-column: span 1; grid-column-start: 1;">
+    <input type="submit" form="create_item_form" value="Submit">
+</div>
+
+
+
+
+
+
+
