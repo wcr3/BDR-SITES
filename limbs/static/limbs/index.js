@@ -37,7 +37,7 @@ window.editData = function editData() {
     for (var i=0; i<elements.length; i++){
         //ignore this special input
         if (elements[i].name === "csrfmiddlewaretoken"){
-            continue; 
+            continue;
         }
         //remove readonly from input so user can edit
         if (elements[i].hasAttribute("readonly")){
@@ -54,7 +54,7 @@ window.addRowSupplier = function addRowSupplier(form_name) {
 
     var table = document.getElementById("supplier_table");
     var base_id = table.rows.length;
-   
+
     // Create new row
     var row = table.insertRow(-1);
 
@@ -62,15 +62,32 @@ window.addRowSupplier = function addRowSupplier(form_name) {
     var supplier = row.insertCell(0);
     var part_no = row.insertCell(1);
     var cost = row.insertCell(2);
-    
-    //need unique names to we can retrieve data from form 
+
+    //need unique names to we can retrieve data from form
     var supp_name = "supplier_name_"+base_id;
     var partno_name = "supplier_partno_"+base_id;
     var link_name = "supplier_link_"+base_id;
-    var cost_name = "supplier_cost_"+base_id; 
+    var cost_name = "supplier_cost_"+base_id;
 
     supplier.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${supp_name}">`;
-    part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;      
+    part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;
     cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">`;
 }
+
+window.addRowLocation = function addRowLocation(form_name) {
+  var table = document.getElementById("location_table");
+  var base_id = table.rows.length;
+
+  var row = table.insertRow(-1);
+  var location = row.insertCell(0);
+  var quantity = row.insertCell(1);
+
+  var location_name = "location_name_"+base_id;
+  var quantity_name = "location_quantity_"+base_id;
+
+  location.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${location_name}">`;
+  quantity.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${quantity_name}">`;
+}
+
+
 //window.onload = async function() {};

@@ -30,7 +30,7 @@ export function make_modal() {
         if (onclick_func) {
             onclick_func(event);
         }
-        if (event.target === background) {
+        if (event.target === background || event.target === document.body) {
             document.body.removeChild(background);
             window.onclick = onclick_func;
         }
@@ -60,7 +60,7 @@ export async function expand_popup(source, parent) {
     var color = window.getComputedStyle(source).backgroundColor;
     popup.style.cssText = '--source_width: ' + rect.width + 'px; --source_height: ' +
                             rect.height + 'px; --source_top: ' + top + 'px; --source_left: ' + left + 'px; --source-br: ' + border + '; --source_bc: ' + color + ';';
-    
+
     popup.appendChild(popup_contents);
     background.appendChild(popup);
     parent.appendChild(background);

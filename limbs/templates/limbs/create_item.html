@@ -3,8 +3,9 @@
     {% csrf_token %}
 </form>
 
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
-<div style="grid-column: span 1; grid-column-start: 1;">
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
     <table>
         <tr>
             <th>
@@ -28,49 +29,43 @@
                 <input form="create_item_form" type="text" name="manufacturer_name">
             </th>
         </tr>
-</div>
+<!-- </div> -->
 
 
-<div style="grid-column: span 1; grid-column-start: 1;">
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
     <table id="supplier_table">
         <tr>
             <th>
                 Supplier
             </th>
             <th>
-                Supplier Part Number - Link 
+                Supplier Part Number - Link
             </th>
             <th>
                 Cost
             </th>
         </tr>
-        
+
     </table>
     <button type="button" onclick="addRowSupplier('create_item_form')">Add</button>
-</div>
+<!-- </div> -->
 
-<div style="grid-column: span 1; grid-column-start: 1;">
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
     <table id="location_table">
         <tr>
             <th>
                 Location
             </th>
             <th>
-                Quantity 
+                Quantity
             </th>
         </tr>
     </table>
-    <!-- <button type="button" onclick="insertNewFunction()">Add</button> -->
-</div>
+    <button type="button" onclick="addRowLocation('create_item_form')">Add</button>
+<!-- </div> -->
 
 
-<div style="grid-column: span 1; grid-column-start: 1;">
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
     <input type="submit" form="create_item_form" value="Submit">
+<!-- </div> -->
 </div>
-
-
-
-
-
-
-

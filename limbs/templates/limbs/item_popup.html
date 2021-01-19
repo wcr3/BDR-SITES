@@ -3,87 +3,99 @@
 <form action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
     {% csrf_token %}
 </form>
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
-<div style="grid-column: span 1; grid-column-start: 1;">
-    <table>
-        <tr>
-            <th>
-                Item Name
-            </th>
-            <th>
-                Part Number
-            </th>
-            <th>
-                Manufacturer (name)
-            </th>
-        </tr>
-        <tr>
-            <th>
-                <input readonly form="edit_item_form" type="text" name="item_name" value={{item.name}}>
-            </th>
-            <th>
-                <input readonly form="edit_item_form" type="text" name="part_number" value={{item.part_number}}>
-            </th>
-            <th>
-                <input readonly form="edit_item_form" type="text" name="manufacturer_name" value={{item.manufacturer}}>
-            </th>
-        </tr>
-        
-</div>
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table>
+          <tr>
+              <th>
+                  Item Name
+              </th>
+              <th>
+                  Part Number
+              </th>
+              <th>
+                  Manufacturer (name)
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="edit_item_form" type="text" name="item_name" value={{item.name}}>
+              </th>
+              <th>
+                  <input readonly form="edit_item_form" type="text" name="part_number" value={{item.part_number}}>
+              </th>
+              <th>
+                  <input readonly form="edit_item_form" type="text" name="manufacturer_name" value={{item.manufacturer}}>
+              </th>
+          </tr>
 
-
-<div style="grid-column: span 1; grid-column-start: 1;">
-    <table id="supplier_table">
-        <tr>
-            <th>
-                Supplier
-            </th>
-            <th>
-                Supplier Part Number - Link 
-            </th>
-            <th>
-                Cost
-            </th>
-        </tr>
-        {% for supplier_info in item.itemsupplier_set.all %}
-        <tr>
-            <td>
-                <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value={{supplier_info.supplier}}>
-            </td>
-            <td>
-                <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value={{supplier_info.supplier_part_number}}> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value={{supplier_info.link}}>
-            </td>
-            <td>
-                <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value={{supplier_info.cost}}>
-            </td>
-        </tr>
-        {% endfor %}
-        
-    </table>
-    <button hidden form="edit_item_form" type="button" onclick="addRowSupplier('edit_item_form')">Add</button>
-</div>
-
-<div style="grid-column: span 1; grid-column-start: 1;">
-    <table id="location_table">
-        <tr>
-            <th>
-                Location
-            </th>
-            <th>
-                Quantity 
-            </th>
-        </tr>
-    </table>
-    <!-- <button type="button" onclick="insertNewFunction()">Add</button> -->
-</div>
+  <!-- </div> -->
 
   
-<div style="grid-column: span 1; grid-column-start: 1;">
-    <input  hidden type="submit" form="edit_item_form" name="Edit" value="Save Changes">
-    <input  hidden type="submit" form="edit_item_form" name="Delete" value="Delete Item"> 
-    <button type="button" onclick="editData()">Edit</button>
-</div>
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table id="supplier_table">
+          <tr>
+              <th>
+                  Supplier
+              </th>
+              <th>
+                  Supplier Part Number - Link
+              </th>
+              <th>
+                  Cost
+              </th>
+          </tr>
+          {% for supplier_info in item.itemsupplier_set.all %}
+          <tr>
+              <td>
+                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value={{supplier_info.supplier}}>
+              </td>
+              <td>
+                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value={{supplier_info.supplier_part_number}}> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value={{supplier_info.link}}>
+              </td>
+              <td>
+                  <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value={{supplier_info.cost}}>
+              </td>
+          </tr>
+          {% endfor %}
 
-{% else %}
-<h1>Invalid Item ID</h1>
-{% endif %}
+      </table>
+      <button hidden form="edit_item_form" type="button" onclick="addRowSupplier('edit_item_form')">Add</button>
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table id="location_table">
+          <tr>
+              <th>
+                  Location
+              </th>
+              <th>
+                  Quantity
+              </th>
+          </tr>
+          {% for quantity_info in item.itemquantity_set.all %}
+          <tr>
+              <td>
+                  <input readonly id=quantity_row form="edit_item_form" type="text" name="location_name_{{forloop.counter}}" value={{quantity_info.location}}>
+              </td>
+              <td>
+                  <input readonly id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value={{quantity_info.quantity}}>
+              </td>
+          </tr>
+          {% endfor %}
+      </table>
+      <button hidden form="edit_item_form" type="button" onclick="addRowLocation('edit_item_form')">Add</button>
+  <!-- </div> -->
+
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <input  hidden type="submit" form="edit_item_form" name="Edit" value="Save Changes">
+      <input  hidden type="submit" form="edit_item_form" name="Delete" value="Delete Item">
+      <button type="button" onclick="editData()">Edit</button>
+  <!-- </div> -->
+
+  {% else %}
+  <h1>Invalid Item ID</h1>
+  {% endif %}
+</div>
