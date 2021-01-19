@@ -4,7 +4,7 @@ import random
 # Create your views here.
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location
 
-def parse_form_create_item(form_data):
+def parse_form_create_item(form_data, item_id=None):
         #make new item
         temp_item = Item(
             name=form_data["item_name"],
@@ -13,19 +13,30 @@ def parse_form_create_item(form_data):
         )
         #TODO add stuff for tags
 
-        #save the just made item
+        #add id 
+        if item_id:
+            temp_item.id = item_id
+        #save the item
         temp_item.save()
 
+        #for supplier and location table determine max id...
+        supplier_max_id = -1 
+        location_max_id = -1 
+        for key in form_data.keys():
+            if "supplier_name_" in key:
+                supplier_max_id = max(supplier_max_id, int(key[-1]))
+            if "location_name_" in key:
+                location_max_id = max(location_max_id, int(key[-1]))
+
         #populating the through fields for suppliers
-        key_id = 1
-        while True:
-            key_a = "supplier_name_"+str(key_id)
-            if key_a not in form_data:
-                break
-            print("key a \n\n\n" + key_a);
-            key_b = "supplier_partno_"+str(key_id)
-            key_c = "supplier_link_"+str(key_id)
-            key_d = "supplier_cost_"+str(key_id)
+        for i in range(1, supplier_max_id+1):
+
+            key_a = "supplier_name_"+str(i)
+            key_b = "supplier_partno_"+str(i)
+            key_c = "supplier_link_"+str(i)
+            key_d = "supplier_cost_"+str(i)
+
+            if key_a not in form_data: continue
 
             item_sup = ItemSupplier(
                 item = temp_item,
@@ -35,23 +46,21 @@ def parse_form_create_item(form_data):
                 cost = "{:.2f}".format(float(form_data[key_d])),
             )
             item_sup.save()
-            key_id+=1
 
-        #TODO add for item locations
-        key_id = 1
-        print(form_data)
-        while True:
-            key_e = "location_name_"+str(key_id)
-            if key_e not in form_data:
-                break
-            key_f = "location_quantity_"+str(key_id)
+        #populating the through fields for locations
+        for i in range(1, location_max_id+1):
+            key_e = "location_name_"+str(i)
+            key_f = "location_quantity_"+str(i)
+
+            if key_e not in form_data: continue
+
             item_quant = ItemQuantity(
                 item = temp_item,
                 location = Location.objects.get(name__iexact=form_data[key_e]),
                 quantity = form_data[key_f],
             )
             item_quant.save()
-            key_id +=1
+
 
 def item_table(request, search):
     item_list = Item.objects
@@ -65,9 +74,9 @@ def edit_item(request, pk):
         #delete original item
         Item.objects.filter(id=pk).delete()
 
-        #make new item
+        #make new item with same id 
         if "Edit" in form_data.keys():
-            parse_form_create_item(form_data)
+            parse_form_create_item(form_data, item_id=pk)
 
     #redirect to home page
     return HttpResponseRedirect('/limbs')

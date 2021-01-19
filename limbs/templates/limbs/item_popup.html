@@ -56,7 +56,8 @@
               </td>
               <td>
                   <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value={{supplier_info.cost}}>
-              </td>
+                  <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('supplier_table', {{forloop.counter}})"> REMOVE </button>
+                </td>
           </tr>
           {% endfor %}
 
@@ -81,6 +82,7 @@
               </td>
               <td>
                   <input readonly id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value={{quantity_info.quantity}}>
+                  <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
               </td>
           </tr>
           {% endfor %}

@@ -50,6 +50,11 @@ window.editData = function editData() {
       }
 }
 
+window.deleteRowTable = function deleteRowTable(table_name, index){
+    var table = document.getElementById(table_name);
+    table.deleteRow(index);
+}
+
 window.addRowSupplier = function addRowSupplier(form_name) {
 
     var table = document.getElementById("supplier_table");
@@ -69,9 +74,12 @@ window.addRowSupplier = function addRowSupplier(form_name) {
     var link_name = "supplier_link_"+base_id;
     var cost_name = "supplier_cost_"+base_id;
 
+    //button to remove
+    var remove_but = `<button type="button" onclick="deleteRowTable('supplier_table', ${base_id})"> REMOVE </button>`;
+
     supplier.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${supp_name}">`;
     part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;
-    cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">`;
+    cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but; 
 }
 
 window.addRowLocation = function addRowLocation(form_name) {
@@ -85,8 +93,11 @@ window.addRowLocation = function addRowLocation(form_name) {
   var location_name = "location_name_"+base_id;
   var quantity_name = "location_quantity_"+base_id;
 
+  //button to remove row 
+  var remove_but = `<button type="button" onclick="deleteRowTable('location_table', ${base_id})"> REMOVE </button>`;
+
   location.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${location_name}">`;
-  quantity.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${quantity_name}">`;
+  quantity.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${quantity_name}">` + remove_but;
 }
 
 
