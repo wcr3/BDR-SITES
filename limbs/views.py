@@ -5,6 +5,7 @@ import random
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location
 
 def parse_form_create_item(form_data, item_id=None):
+        print(form_data)
         #make new item
         temp_item = Item(
             name=form_data["item_name"],
@@ -66,6 +67,19 @@ def item_table(request, search):
     item_list = Item.objects
     return render(request, 'limbs/item_table.html', {'item_list': item_list})
 
+def item_popup(request, pk):
+    item = Item.objects.get(id=pk)
+    manufacturers = Manufacturer.objects.all
+    suppliers = Supplier.objects.all 
+    locations = Location.objects.all 
+    return render(request, 
+    'limbs/item_popup.html', 
+    {"item":item,
+    "manufacturers":manufacturers, 
+    "suppliers":suppliers, 
+    "locations":locations})
+
+
 def edit_item(request, pk):
 
     if request.method == 'POST':
@@ -92,4 +106,11 @@ def create_item(request):
         #redirect to home page
         return HttpResponseRedirect('/limbs')
     else:
-        return render(request, 'limbs/create_item.html', {})
+        manufacturers = Manufacturer.objects.all
+        suppliers = Supplier.objects.all 
+        locations = Location.objects.all 
+        return render(request, 
+        'limbs/create_item.html', 
+        {"manufacturers":manufacturers, 
+        "suppliers":suppliers, 
+        "locations":locations})

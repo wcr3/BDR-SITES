@@ -3,6 +3,25 @@
 <form action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
     {% csrf_token %}
 </form>
+
+<datalist id="manufacturers">
+    {% for manufacturer in manufacturers %}
+        <option value="{{ manufacturer.name}}">
+    {% endfor %}
+</datalist>
+    
+<datalist id="suppliers">
+    {% for supplier in suppliers %}
+        <option value="{{ supplier.name}}">
+    {% endfor %}
+</datalist>
+    
+<datalist id="locations">
+    {% for location in locations %}
+        <option value="{{ location.name}}">
+    {% endfor %}
+</datalist>
+
 <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
@@ -20,13 +39,13 @@
           </tr>
           <tr>
               <th>
-                  <input readonly form="edit_item_form" type="text" name="item_name" value={{item.name}}>
+                  <input readonly form="edit_item_form" type="text" name="item_name" value="{{item.name}}">
               </th>
               <th>
-                  <input readonly form="edit_item_form" type="text" name="part_number" value={{item.part_number}}>
+                  <input readonly form="edit_item_form" type="text" name="part_number" value="{{item.part_number}}">
               </th>
               <th>
-                  <input readonly form="edit_item_form" type="text" name="manufacturer_name" value={{item.manufacturer}}>
+                  <input readonly list="manufacturers" form="edit_item_form" type="text" name="manufacturer_name" value="{{item.manufacturer}}">
               </th>
           </tr>
 
@@ -49,13 +68,13 @@
           {% for supplier_info in item.itemsupplier_set.all %}
           <tr>
               <td>
-                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value={{supplier_info.supplier}}>
+                  <input readonly list="suppliers" id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value="{{supplier_info.supplier}}">
               </td>
               <td>
-                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value={{supplier_info.supplier_part_number}}> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value={{supplier_info.link}}>
+                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value="{{supplier_info.supplier_part_number}}"> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value="{{supplier_info.link}}">
               </td>
               <td>
-                  <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value={{supplier_info.cost}}>
+                  <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
                   <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('supplier_table', {{forloop.counter}})"> REMOVE </button>
                 </td>
           </tr>
@@ -78,10 +97,10 @@
           {% for quantity_info in item.itemquantity_set.all %}
           <tr>
               <td>
-                  <input readonly id=quantity_row form="edit_item_form" type="text" name="location_name_{{forloop.counter}}" value={{quantity_info.location}}>
+                  <input list="locations" readonly id=quantity_row form="edit_item_form" type="text" name="location_name_{{forloop.counter}}" value="{{quantity_info.location}}">
               </td>
               <td>
-                  <input readonly id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value={{quantity_info.quantity}}>
+                  <input readonly id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
                   <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
               </td>
           </tr>

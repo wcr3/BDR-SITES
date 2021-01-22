@@ -77,7 +77,7 @@ window.addRowSupplier = function addRowSupplier(form_name) {
     //button to remove
     var remove_but = `<button type="button" onclick="deleteRowTable('supplier_table', ${base_id})"> REMOVE </button>`;
 
-    supplier.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${supp_name}">`;
+    supplier.innerHTML = `<input id=supplier_row form="${form_name}" list="suppliers" type="text" name="${supp_name}">`;
     part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;
     cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but; 
 }
@@ -96,7 +96,7 @@ window.addRowLocation = function addRowLocation(form_name) {
   //button to remove row 
   var remove_but = `<button type="button" onclick="deleteRowTable('location_table', ${base_id})"> REMOVE </button>`;
 
-  location.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${location_name}">`;
+  location.innerHTML = `<input id=location_row form="${form_name}" list="locations" type="text" name="${location_name}">`;
   quantity.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${quantity_name}">` + remove_but;
 }
 

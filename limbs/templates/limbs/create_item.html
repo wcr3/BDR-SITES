@@ -3,6 +3,24 @@
     {% csrf_token %}
 </form>
 
+<datalist id="manufacturers">
+{% for manufacturer in manufacturers %}
+    <option value="{{ manufacturer.name}}">
+{% endfor %}
+</datalist>
+
+<datalist id="suppliers">
+    {% for supplier in suppliers %}
+        <option value="{{ supplier.name}}">
+    {% endfor %}
+</datalist>
+
+<datalist id="locations">
+    {% for location in locations %}
+        <option value="{{ location.name}}">
+    {% endfor %}
+</datalist>
+
 <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
 <!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
@@ -26,7 +44,7 @@
                 <input form="create_item_form" type="text" name="part_number">
             </th>
             <th>
-                <input form="create_item_form" type="text" name="manufacturer_name">
+                <input list="manufacturers" form="create_item_form" type="text" name="manufacturer_name">
             </th>
         </tr>
 <!-- </div> -->
