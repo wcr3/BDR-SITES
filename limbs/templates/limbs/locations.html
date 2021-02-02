@@ -2,15 +2,14 @@
 
 {% load static %}
 
-
 {% block title %}LIMBS{% endblock %}
 {% block header %}
 <script type="module" src="{% static 'limbs/index.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'limbs/items.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'limbs/locations.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1>LIMBS</h1>
+<h1>Locations</h1>
 <!--
 <h2>Add a Part, Tool, Subsytem, or Component</h2>
 <form id="item_sub_frm" action="/submit/item">
@@ -28,10 +27,10 @@
 -->
 <h2>Database</h2>
 
-<button type="button" onclick="item_popup(event, '{% url 'limbs:create_item' %}')">Create Item</button>
+<button type="button" onclick="location_popup(event, '{% url 'limbs:create_location' %}')">Create Location</button>
 
-<div id="item_tbl">
-    {% include "./item_table.html" with item_list=item_list only %}
+<div id="location_tbl">
+    {% include "./location_table.html" with location_list=location_list only %}
 </div>
 
 {% endblock %}

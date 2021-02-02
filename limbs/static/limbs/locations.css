@@ -1,4 +1,4 @@
-#item_tbl {
+#location_tbl {
     position: relative;
     /*overflow: hidden;
     border-radius: 5px;*/
@@ -25,17 +25,7 @@ tr:not(:first-child):hover {
     color: black;
 }
 
-.table_popup {
-    padding: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-auto-rows: 0.5fr;
-    gap: 10px;
-    justify-items: stretch;
-    align-items: stretch;
-}
-
-.supplier_popup {
+.location_popup {
     padding: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr;

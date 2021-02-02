@@ -1,0 +1,52 @@
+{% if supplier %}
+
+<form action="{% url 'limbs:edit_supplier' supplier.id %}" method="post" id="edit_supplier_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table>
+          <tr>
+              <th>
+                  Name
+              </th>
+              <th>
+                  Link
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="edit_supplier_form" type="text" name="supplier_name" value="{{supplier.name}}">
+              </th>
+              <th>
+                  <input readonly form="edit_supplier_form" type="url" name="supplier_link" value="{{supplier.link}}">
+              </th>
+          </tr>
+
+  <!-- </div> -->
+
+  
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <input  hidden type="submit" form="edit_supplier_form" name="Edit" value="Save Changes">
+      <input  hidden type="submit" form="edit_supplier_form" name="Delete" value="Delete Supplier">
+      <button type="button" onclick="editSupplier()">Edit</button>
+  <!-- </div> -->
+
+  {% else %}
+  <h1>Invalid Supplier ID</h1>
+  {% endif %}
+</div>

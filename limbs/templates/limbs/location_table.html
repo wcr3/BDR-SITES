@@ -1,0 +1,12 @@
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Parent</th>
+    </tr>
+    {% for location in location_list %}
+    <tr onclick="location_popup(event, '{% url 'limbs:location_popup' location.id %}')"> 
+        <td>{{location.name}}</td>
+        <td>{{location.parent}}</td>
+    </tr>
+    {% endfor %}
+</table>

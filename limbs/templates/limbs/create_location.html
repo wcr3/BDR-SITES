@@ -1,0 +1,36 @@
+<form action="{% url 'limbs:create_location' %}" method="post" id="create_location_form">
+    {% csrf_token %}
+</form>
+
+<datalist id="locations">
+    {% for location in locations %}
+        <option value="{{ location.name}}">
+    {% endfor %}
+</datalist>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <table>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Parent
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input form="create_location_form" type="text" name="location_name">
+            </th>
+            <th>
+                <input list="locations" form="create_location_form" type="text" name="location_parent">
+            </th>
+        </tr>
+<!-- </div> -->
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <input type="submit" form="create_location_form" value="Submit">
+<!-- </div> -->
+</div>

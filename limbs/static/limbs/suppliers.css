@@ -1,4 +1,4 @@
-#item_tbl {
+#supplier_tbl {
     position: relative;
     /*overflow: hidden;
     border-radius: 5px;*/
@@ -23,16 +23,6 @@ tr:not(:first-child):hover {
     justify-content: center;
     background-color: #CF6679;
     color: black;
-}
-
-.table_popup {
-    padding: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-auto-rows: 0.5fr;
-    gap: 10px;
-    justify-items: stretch;
-    align-items: stretch;
 }
 
 .supplier_popup {

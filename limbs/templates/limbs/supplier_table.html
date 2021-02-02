@@ -1,0 +1,12 @@
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Link</th>
+    </tr>
+    {% for supplier in supplier_list %}
+    <tr onclick="supplier_popup(event, '{% url 'limbs:supplier_popup' supplier.id %}')"> 
+        <td>{{supplier.name}}</td>
+        <td>{{supplier.link}}</td>
+    </tr>
+    {% endfor %}
+</table>

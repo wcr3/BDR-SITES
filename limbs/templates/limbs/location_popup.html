@@ -1,0 +1,58 @@
+{% if location %}
+
+<form action="{% url 'limbs:edit_location' location.id %}" method="post" id="edit_location_form">
+    {% csrf_token %}
+</form>
+
+<datalist id="locations">
+    {% for location in locations %}
+        <option value="{{ location.name}}">
+    {% endfor %}
+</datalist>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table>
+          <tr>
+              <th>
+                  Name
+              </th>
+              <th>
+                  Parent
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="edit_location_form" type="text" name="location_name" value="{{location.name}}">
+              </th>
+              <th>
+                  <input readonly list="locations" form="edit_location_form" type="text" name="location_parent" value="{{location.parent}}">
+              </th>
+          </tr>
+
+  <!-- </div> -->
+
+  
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+     
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+  
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+ 
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <input  hidden type="submit" form="edit_location_form" name="Edit" value="Save Changes">
+      <input  hidden type="submit" form="edit_location_form" name="Delete" value="Delete Location">
+      <button type="button" onclick="editLocation()">Edit</button>
+  <!-- </div> -->
+
+  {% else %}
+  <h1>Invalid Location ID</h1>
+  {% endif %}
+</div>

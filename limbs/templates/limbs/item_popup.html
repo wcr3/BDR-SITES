@@ -22,6 +22,12 @@
     {% endfor %}
 </datalist>
 
+<datalist id="tags">
+    {% for tag in tags %}
+        <option value="{{ tag.name}}">
+    {% endfor %}
+</datalist>
+
 <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
@@ -109,6 +115,24 @@
       <button hidden form="edit_item_form" type="button" onclick="addRowLocation('edit_item_form')">Add</button>
   <!-- </div> -->
 
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+    <table id="tag_table">
+        <tr>
+            <th>
+                Tags
+            </th>
+        </tr>
+        {% for tag in item.tags.all %}
+        <tr>
+            <td>
+                <input list="tags" readonly id=tag_row form="edit_item_form" type="text" name="tag_name_{{forloop.counter}}" value="{{tag.name}}">
+                <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button hidden form="edit_item_form" type="button" onclick="addRowTag('edit_item_form')">Add</button>
+  <!-- </div> -->
 
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
       <input  hidden type="submit" form="edit_item_form" name="Edit" value="Save Changes">
