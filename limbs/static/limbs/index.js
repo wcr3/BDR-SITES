@@ -28,11 +28,49 @@ window.item_popup = async function item_popup(e, path) {
         return;
     }
 }
+window.toggleDisplay = function toggleDisplay() {
+  const paragraph = document.getElementsByClassName("paragraph");
+  const tables = document.getElementsByClassName("table");
+  const changes = document.getElementById("changes");
+  const del = document.getElementById("delete");
+  const edit_button = document.getElementById("edit");
+  if(changes.hasAttribute("hidden") && del.hasAttribute("hidden")){
+    changes.removeAttribute("hidden");
+    del.removeAttribute("hidden");
+  }
+  else{
+    changes.setAttribute("hidden",true);
+    del.setAttribute("hidden",true);
+  }
+  //Its in the edit state
+  if(edit_button.innerHTML.localeCompare("Edit") == 0){
+    edit_button.innerHTML = "Display";
+  }
+  else{
+    edit_button.innerHTML = "Edit"; 
+  }
+  for(var i = 0; i < paragraph.length; ++i){
+    if(paragraph[i].style.display.localeCompare("none") == 0){
+      paragraph[i].style.display = "block";
+    }
+    else{
+      paragraph[i].style.display = "none";
+    }
+  }
+  //Loop through tables
+  for(var i = 0; i < tables.length; ++i){
+    if(tables[i].style.display.localeCompare("block") == 0){
+        tables[i].style.display = "none";
+    }
+    else{
+        tables[i].style.display = "block";
+    }
+  }
+}
 
 window.editData = function editData() {
     var form_name = "edit_item_form";
     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-
     var elements = document.forms[form_name].elements;
     for (var i=0; i<elements.length; i++){
         //ignore this special input
@@ -107,7 +145,6 @@ window.validateForm = function validateForm(){
      
 }
 window.addRowSupplier = function addRowSupplier(form_name) {
-
     var table = document.getElementById("supplier_table");
     var base_id = table.rows.length;
 
@@ -144,7 +181,7 @@ window.addRowLocation = function addRowLocation(form_name) {
   var location_name = "location_name_"+base_id;
   var quantity_name = "location_quantity_"+base_id;
 
-  //button to remove row 
+  //button to remove row
   var remove_but = `<button type="button" onclick="deleteRowTable('location_table', ${base_id})"> REMOVE </button>`;
 
   location.innerHTML = `<input required id=location_row_name form="${form_name}" list="locations" type="text" name="${location_name}">`;
@@ -152,4 +189,4 @@ window.addRowLocation = function addRowLocation(form_name) {
 }
 
 
-//window.onload = async function() {};
+// window.onload = async function() {};

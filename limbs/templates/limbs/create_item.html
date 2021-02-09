@@ -21,9 +21,9 @@
     {% endfor %}
 </datalist>
 
-<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
-<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+
+<div style = "display: block; grid-column-start: 1; grid-column: span 3;">
     <table>
         <tr>
             <th>
@@ -47,10 +47,11 @@
                 <input required list="manufacturers" form="create_item_form" type="text" name="manufacturer_name">
             </th>
         </tr>
-<!-- </div> -->
+    </table>
+</div>
 
 
-<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+<div style="display: block; grid-column: span 1;">
     <table id="supplier_table">
         <tr>
             <th>
@@ -66,9 +67,9 @@
 
     </table>
     <button type="button" onclick="addRowSupplier('create_item_form')">Add</button>
-<!-- </div> -->
+</div>
 
-<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+<div style="display: block;grid-column: span 1;">
     <table id="location_table">
         <tr>
             <th>
@@ -80,10 +81,9 @@
         </tr>
     </table>
     <button type="button" onclick="addRowLocation('create_item_form')">Add</button>
-<!-- </div> -->
+</div>
 
 
-<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+<div style="display: block; grid-column: span 1; grid-column-start: 1; justify-items: center;">
     <input type="submit" form="create_item_form" value="Submit">
-<!-- </div> -->
 </div>
