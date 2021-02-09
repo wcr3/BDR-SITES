@@ -55,6 +55,57 @@ window.deleteRowTable = function deleteRowTable(table_name, index){
     table.deleteRow(index);
 }
 
+window.validateForm = function validateForm(){
+
+        
+    //validate suppliers
+    var supplier_row_names = document.querySelectorAll('[id=supplier_row_name]');
+    var supplier_names = document.getElementById("suppliers").options;
+    var supplier_name_lst = []
+    for (var i=0; i<supplier_names.length; i++){
+        supplier_name_lst.push(supplier_names[i].value.toLowerCase()); 
+    }
+
+    for (var i=0; i<supplier_row_names.length; i++){
+        if (!supplier_name_lst.includes(supplier_row_names[i].value.toLowerCase())){
+            window.alert(supplier_row_names[i].value+" is not a valid supplier");
+            return false;
+        }
+    }
+
+    //validate locations 
+    var location_row_names = document.querySelectorAll('[id=location_row_name]');
+    var location_names = document.getElementById("locations").options;
+    var location_name_lst = []
+    for (var i=0; i<location_names.length; i++){
+        location_name_lst.push(location_names[i].value.toLowerCase()); 
+    }
+
+    for (var i=0; i<location_row_names.length; i++){
+        if (!location_name_lst.includes(location_row_names[i].value.toLowerCase())){
+            window.alert(location_row_names[i].value+" is not a valid location");
+            return false;
+        }
+    }
+
+    //validate manufacturers 
+    var manufacuturer_name = document.getElementsByName("manufacturer_name")[0].value.toLowerCase();
+    var manufacuturer_names = document.getElementById("manufacturers").options;
+    var manufacuturer_name_lst = []
+    for (var i=0; i<manufacuturer_names.length; i++){
+        manufacuturer_name_lst.push(manufacuturer_names[i].value.toLowerCase()); 
+    }
+
+    if (!manufacuturer_name_lst.includes(manufacuturer_name)){
+        window.alert(manufacuturer_name + " is not a valid location");
+        return false 
+    }
+
+    return true; // submit the form
+     
+    // return false; // don't submit the form
+     
+}
 window.addRowSupplier = function addRowSupplier(form_name) {
 
     var table = document.getElementById("supplier_table");
@@ -77,9 +128,9 @@ window.addRowSupplier = function addRowSupplier(form_name) {
     //button to remove
     var remove_but = `<button type="button" onclick="deleteRowTable('supplier_table', ${base_id})"> REMOVE </button>`;
 
-    supplier.innerHTML = `<input id=supplier_row form="${form_name}" list="suppliers" type="text" name="${supp_name}">`;
-    part_no.innerHTML = `<input id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input form="${form_name}" type="url" name="${link_name}">`;
-    cost.innerHTML = `<input id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but; 
+    supplier.innerHTML = `<input required id=supplier_row_name form="${form_name}" list="suppliers" type="text" name="${supp_name}">`;
+    part_no.innerHTML = `<input required id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input required form="${form_name}" type="url" name="${link_name}">`;
+    cost.innerHTML = `<input required id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but; 
 }
 
 window.addRowLocation = function addRowLocation(form_name) {
@@ -96,8 +147,8 @@ window.addRowLocation = function addRowLocation(form_name) {
   //button to remove row 
   var remove_but = `<button type="button" onclick="deleteRowTable('location_table', ${base_id})"> REMOVE </button>`;
 
-  location.innerHTML = `<input id=location_row form="${form_name}" list="locations" type="text" name="${location_name}">`;
-  quantity.innerHTML = `<input id=location_row form="${form_name}" type="text" name="${quantity_name}">` + remove_but;
+  location.innerHTML = `<input required id=location_row_name form="${form_name}" list="locations" type="text" name="${location_name}">`;
+  quantity.innerHTML = `<input required id=location_row form="${form_name}" type="text" name="${quantity_name}">` + remove_but;
 }
 
 

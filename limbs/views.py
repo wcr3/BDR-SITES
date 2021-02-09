@@ -3,6 +3,72 @@ from django.http import HttpResponseRedirect
 import random
 # Create your views here.
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location
+from django.db.models import Q 
+import openpyxl
+
+
+def upload_excel(request):
+    """
+    source: https://pythoncircle.com/post/591/how-to-upload-and-process-the-excel-file-in-django/
+    should standarize this
+    """
+    excel_file = request.FILES["excel_file"]
+    # you may put validations here to check extension or file size
+    wb = openpyxl.load_workbook(excel_file)
+    # getting a particular sheet by name out of many sheets
+    sheets = wb.sheetnames
+    print(sheets)
+
+    worksheet = wb["Sheet1"]
+    print(worksheet)
+
+    excel_data = []
+    # iterating over the rows and
+    # getting value from each cell in row
+    for row in worksheet.iter_rows():
+        row_data = []
+        for cell in row:
+            row_data.append(str(cell.value))
+        excel_data.append(row_data)
+
+    print(excel_data)
+
+    return HttpResponseRedirect('/limbs')
+
+
+def item_search(request):
+    model = Item 
+    item_list = Item.objects.all()
+    name = None
+    part_no = None 
+    manuf = None 
+    if request.method == "GET":
+        print(request.GET)
+        print("WOOHOOO!")
+        form_data = request.GET
+        if len(form_data) > 1:
+            name = form_data["item_name"]
+            part_no = form_data["item_part_no"]
+            manuf = form_data["item_manufacturer"]
+
+            if name == "" and part_no == "" and manuf == "": #just pressed serach bar
+                item_list = Item.objects.all() 
+            elif Manufacturer.objects.filter(name__iexact=manuf).count() > 0:
+                manuf_obj = Manufacturer.objects.get(name__iexact=manuf)
+                item_list = Item.objects.filter(
+                    Q(name=name) | Q(part_number=part_no) | Q(manufacturer=manuf_obj)
+                )
+            else:
+                item_list = Item.objects.filter(
+                    Q(name=name) | Q(part_number=part_no)
+                )
+
+    return render(request, 
+        'limbs/index.html', 
+        {"item_list":item_list,
+        "name":name,
+        "part_no":part_no,
+        "manuf":manuf})
 
 def parse_form_create_item(form_data, item_id=None):
         print(form_data)

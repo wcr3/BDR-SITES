@@ -1,5 +1,5 @@
 
-<form action="{% url 'limbs:create_item' %}" method="post" id="create_item_form">
+<form onsubmit="return validateForm()" action="{% url 'limbs:create_item' %}" method="post" id="create_item_form">
     {% csrf_token %}
 </form>
 
@@ -38,13 +38,13 @@
         </tr>
         <tr>
             <th>
-                <input form="create_item_form" type="text" name="item_name">
+                <input required form="create_item_form" type="text" name="item_name">
             </th>
             <th>
-                <input form="create_item_form" type="text" name="part_number">
+                <input required form="create_item_form" type="text" name="part_number">
             </th>
             <th>
-                <input list="manufacturers" form="create_item_form" type="text" name="manufacturer_name">
+                <input required list="manufacturers" form="create_item_form" type="text" name="manufacturer_name">
             </th>
         </tr>
 <!-- </div> -->
