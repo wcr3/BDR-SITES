@@ -9,23 +9,96 @@
         <option value="{{ manufacturer.name}}">
     {% endfor %}
 </datalist>
-    
+
 <datalist id="suppliers">
     {% for supplier in suppliers %}
         <option value="{{ supplier.name}}">
     {% endfor %}
 </datalist>
-    
+
 <datalist id="locations">
     {% for location in locations %}
         <option value="{{ location.name}}">
     {% endfor %}
 </datalist>
+  <div class = "paragraph" style = "grid-column: span 3; justify-self: start;">
+    <h3>
+      <p>
+      {{item.name}}
+      </p>
+      <p>
+      #{{item.part_number}}
+      </p>
+      <p>
+      {{item.manufacturer}}
+      </p>
+    </h3>
+  </div>
 
-<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
-  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
-      <table>
+    <div class = "paragraph" style = "grid-column: span 1;">
+    <table>
+        <tr>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Supplier Part Number - Link
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+        {% for supplier_info in item.itemsupplier_set.all %}
+        <tr>
+            <td>
+                <p>
+                  {{supplier_info.supplier}}
+                </p>
+            </td>
+            <td>
+                <p> {{supplier_info.supplier_part_number}} -  {{supplier_info.link}} </p>
+            <td>
+                <p>
+                  {{supplier_info.cost}}
+                </p>
+              </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class = "paragraph" style = "grid-column: span 1;">
+    <table>
+        <tr>
+            <th>
+                Location
+            </th>
+            <th>
+                Quantity
+            </th>
+        </tr>
+        {% for quantity_info in item.itemquantity_set.all %}
+        <tr>
+            <td>
+              <p>
+                {{quantity_info.location}}
+              </p>
+            </td>
+            <td>
+              <p>
+                {{quantity_info.quantity}}
+              </p>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+  </div>
+
+</div>
+
+  <div class = "table" style = "display: none; grid-column-start: 1; grid-column: span 3;">
+        <table id = "name_table">
           <tr>
               <th>
                   Item Name
@@ -39,20 +112,19 @@
           </tr>
           <tr>
               <th>
-                  <input readonly form="edit_item_form" type="text" name="item_name" value="{{item.name}}">
+                  <input form="edit_item_form" type="text" name="item_name" value="{{item.name}}">
               </th>
               <th>
-                  <input readonly form="edit_item_form" type="text" name="part_number" value="{{item.part_number}}">
+                  <input form="edit_item_form" type="text" name="part_number" value="{{item.part_number}}">
               </th>
               <th>
-                  <input readonly list="manufacturers" form="edit_item_form" type="text" name="manufacturer_name" value="{{item.manufacturer}}">
+                  <input list="manufacturers" form="edit_item_form" type="text" name="manufacturer_name" value="{{item.manufacturer}}">
               </th>
           </tr>
+        </table>
+  </div>
 
-  <!-- </div> -->
-
-  
-  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+  <div class = "table" style=" display: none; grid-column: span 1;">
       <table id="supplier_table">
           <tr>
               <th>
@@ -68,23 +140,22 @@
           {% for supplier_info in item.itemsupplier_set.all %}
           <tr>
               <td>
-                  <input readonly list="suppliers" id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value="{{supplier_info.supplier}}">
+                  <input list="suppliers" id=supplier_row form="edit_item_form" type="text" name="supplier_name_{{forloop.counter}}" value="{{supplier_info.supplier}}">
               </td>
               <td>
-                  <input readonly id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value="{{supplier_info.supplier_part_number}}"> - <input readonly form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value="{{supplier_info.link}}">
+                  <input id=supplier_row form="edit_item_form" type="text" name="supplier_partno_{{forloop.counter}}" value="{{supplier_info.supplier_part_number}}"> - <input form="edit_item_form" type="url" name="supplier_link_{{forloop.counter}}" value="{{supplier_info.link}}">
               </td>
               <td>
-                  <input readonly id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
-                  <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('supplier_table', {{forloop.counter}})"> REMOVE </button>
+                  <input id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
+                  <button form="edit_item_form" type="button" onclick="deleteRowTable('supplier_table', {{forloop.counter}})"> REMOVE </button>
                 </td>
           </tr>
           {% endfor %}
-
       </table>
-      <button hidden form="edit_item_form" type="button" onclick="addRowSupplier('edit_item_form')">Add</button>
-  <!-- </div> -->
+      <button form="edit_item_form" type="button" onclick="addRowSupplier('edit_item_form')">Add</button>
+  </div>
 
-  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+  <div class = "table" style= "display: none; grid-column: span 1;">
       <table id="location_table">
           <tr>
               <th>
@@ -97,26 +168,26 @@
           {% for quantity_info in item.itemquantity_set.all %}
           <tr>
               <td>
-                  <input list="locations" readonly id=quantity_row form="edit_item_form" type="text" name="location_name_{{forloop.counter}}" value="{{quantity_info.location}}">
+                  <input list="locations" id=quantity_row form="edit_item_form" type="text" name="location_name_{{forloop.counter}}" value="{{quantity_info.location}}">
               </td>
               <td>
-                  <input readonly id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
-                  <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
+                  <input id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
+                  <button form="edit_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
               </td>
           </tr>
           {% endfor %}
       </table>
-      <button hidden form="edit_item_form" type="button" onclick="addRowLocation('edit_item_form')">Add</button>
-  <!-- </div> -->
+      <button form="edit_item_form" type="button" onclick="addRowLocation('edit_item_form')">Add</button>
+  </div>
 
 
-  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
-      <input  hidden type="submit" form="edit_item_form" name="Edit" value="Save Changes">
-      <input  hidden type="submit" form="edit_item_form" name="Delete" value="Delete Item">
-      <button type="button" onclick="editData()">Edit</button>
-  <!-- </div> -->
+  <div id = "table" style="grid-column: span 1; grid-column-start: 1; justify-items: center;">
+      <input hidden id = "changes" type="submit" form="edit_item_form" name="Edit" value="Save Changes">
+      <input hidden id = "delete" type="submit" form="edit_item_form" name="Delete" value="Delete Item">
+      <button id = "edit" type="button" onclick="toggleDisplay()">Edit</button>
+  </div>
+
 
   {% else %}
   <h1>Invalid Item ID</h1>
   {% endif %}
-</div>
