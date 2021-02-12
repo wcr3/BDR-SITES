@@ -31,7 +31,9 @@ class Location(models.Model):
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        if self.parent: 
+            return self.name + "." + str(self.parent)
+        return self.name 
 
 class Item(models.Model):
     name = models.CharField(max_length=255)

@@ -18,9 +18,17 @@
 
 <datalist id="locations">
     {% for location in locations %}
-        <option value="{{ location.name}}">
+        <option data-id="{{location.id}}" value="{{location}}">
+        <!-- {% if location.parent %}
+        <option data-id="{{location.id}}" value="{{location.name}}.{{location.parent}}">
+        {% else %}
+        <option data-id="{{location.id}}" value="{{location.name}}">
+        {% endif %} -->
     {% endfor %}
 </datalist>
+
+<div id="hidden_container"></div>
+
   <div class = "paragraph" style = "grid-column: span 3; justify-self: start;">
     <h3>
       <p>

@@ -1,0 +1,142 @@
+{% extends "shared/base.html" %}
+
+{% load static %}
+
+
+{% block title %}LIMBS{% endblock %}
+{% block header %}
+<script type="module" src="{% static 'limbs/index.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'limbs/items.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>LIMBS</h1>
+
+<!-- TODO: Need to write a function:validateBulkForm(), but don't worry about this for now...
+    Need a new route: replace "limbs:create_item" with "limbs:create_bulk_items".
+    Write the new view functinoaliy for create_bulk_items(), It should repeatedely call 
+    parse_form_create_item() function in views.py. We will need to pass a form_data to that 
+    function which we can make. 
+    Note that all the field names here are pre_pended with an index "{{forloop.parentloop.counter}}", 
+    so we can loop in the view via that. As we loop we can make a form_data which we can then 
+    send to parse_form_create_item().
+-->
+<form onsubmit="return validateBulkForm()" action="{% url 'limbs:create_item' %}" method="post" id="create_bulk_item_form">
+    {% csrf_token %}
+</form>
+
+<datalist id="manufacturers">
+{% for manufacturer in manufacturers %}
+    <option value="{{ manufacturer.name}}">
+{% endfor %}
+</datalist>
+
+<datalist id="suppliers">
+    {% for supplier in suppliers %}
+        <option value="{{ supplier.name}}">
+    {% endfor %}
+</datalist>
+
+<datalist id="locations">
+    {% for location in locations %}
+        <option data-id="{{location.id}}" value="{{location}}">
+    {% endfor %}
+</datalist>
+
+<div id="hidden_container"></div>
+
+
+{% for item in items_to_create %}
+
+    <div class = "table" style = "grid-column-start: 1; grid-column: span 3;">
+        <table id = "name_table">
+        <tr>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Part Number
+            </th>
+            <th>
+                Manufacturer (name)
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input required  form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_item_name" value="{{item.name}}">
+            </th>
+            <th>
+                <input required  form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_part_number" value="{{item.part_number}}">
+            </th>
+            <th>
+                <input required  list="manufacturers" form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_manufacturer_name" value="{{item.manufacturer}}">
+            </th>
+        </tr>
+        </table>
+    </div>
+
+    <!-- <div class = "table" style="grid-column: span 1;">
+    <table id="supplier_table">
+        <tr>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Supplier Part Number - Link
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+        {% for supplier_info in item.supplier_info %}
+        <tr>
+            <td>
+                <input required  list="suppliers" id=supplier_row_name form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_supplier_name_{{forloop.counter}}" value="{{supplier_info.supplier}}">
+            </td>
+            <td>
+                <input required  id=supplier_row form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_supplier_partno_{{forloop.counter}}" value="{{supplier_info.supplier_part_number}}"> - <input required  form="create_bulk_item_form" type="url" name="{{forloop.parentloop.counter}}_supplier_link_{{forloop.counter}}" value="{{supplier_info.link}}">
+            </td>
+            <td>
+                <input required  id=supplier_row form="create_bulk_item_form" type="number" name="{{forloop.parentloop.counter}}_supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
+                </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div> -->
+
+    <div class = "table" style= "grid-column: span 1;">
+    <table id="location_table">
+        <tr>
+            <th>
+                Location
+            </th>
+            <th>
+                Quantity
+            </th>
+        </tr>
+        {% for quantity_info in item.quantity_info %}
+        <tr>
+            <td>
+                <input required list="locations"  id=location_row_name form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_location_name_{{forloop.counter}}" value="{{quantity_info.location}}">
+            </td>
+            <td>
+                <input required  id=quantity_row form="create_bulk_item_form" type="number" name="{{forloop.parentloop.counter}}_location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+
+    <hr style="width:50%;text-align:left;margin-left:0">
+
+{% endfor %}
+
+
+
+<div id = "table" style="grid-column: span 1; grid-column-start: 1; justify-items: center;">
+    <input type="submit" form="create_bulk_item_form" name="Edit" value="Bulk Add">
+    <input type="submit" form="create_bulk_item_form" name="Delete" value="Exit">
+</div>
+
+
+{% endblock %}

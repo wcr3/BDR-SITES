@@ -111,21 +111,6 @@ window.validateForm = function validateForm(){
         }
     }
 
-    //validate locations 
-    var location_row_names = document.querySelectorAll('[id=location_row_name]');
-    var location_names = document.getElementById("locations").options;
-    var location_name_lst = []
-    for (var i=0; i<location_names.length; i++){
-        location_name_lst.push(location_names[i].value.toLowerCase()); 
-    }
-
-    for (var i=0; i<location_row_names.length; i++){
-        if (!location_name_lst.includes(location_row_names[i].value.toLowerCase())){
-            window.alert(location_row_names[i].value+" is not a valid location");
-            return false;
-        }
-    }
-
     //validate manufacturers 
     var manufacuturer_name = document.getElementsByName("manufacturer_name")[0].value.toLowerCase();
     var manufacuturer_names = document.getElementById("manufacturers").options;
@@ -139,9 +124,41 @@ window.validateForm = function validateForm(){
         return false 
     }
 
+
+    //validate locations 
+    var location_row_names = document.querySelectorAll('[id=location_row_name]');
+    var location_names = document.getElementById("locations").options;
+    var location_name_lst = []
+    var location_name_to_id = []
+    for (var i=0; i<location_names.length; i++){
+        location_name_lst.push(location_names[i].value.toLowerCase()); 
+        location_name_to_id.push(location_names[i].getAttribute("data-id"));
+    }
+
+    for (var i=0; i<location_row_names.length; i++){
+        if (!location_name_lst.includes(location_row_names[i].value.toLowerCase())){
+            window.alert(location_row_names[i].value+" is not a valid location");
+            return false;
+        }
+    }
+
+    //override values to be ids for location  
+    var container = document.getElementById("hidden_container");
+    for (var i=0; i < location_row_names.length; i++){
+        var index = location_name_lst.indexOf(location_row_names[i].value.toLowerCase())
+        var corresponding_id = location_name_to_id[index];
+        
+        //make a hidden node 
+        var hidden_input = location_row_names[i].cloneNode( true );
+        hidden_input.style.display = "none";
+        hidden_input.value = corresponding_id
+        hidden_input.name = "id_" + hidden_input.name
+        container.appendChild(hidden_input);
+    }
+
+    
     return true; // submit the form
      
-    // return false; // don't submit the form
      
 }
 window.addRowSupplier = function addRowSupplier(form_name) {

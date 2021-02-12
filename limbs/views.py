@@ -10,30 +10,41 @@ import openpyxl
 def upload_excel(request):
     """
     source: https://pythoncircle.com/post/591/how-to-upload-and-process-the-excel-file-in-django/
-    should standarize this
     """
     excel_file = request.FILES["excel_file"]
     # you may put validations here to check extension or file size
     wb = openpyxl.load_workbook(excel_file)
     # getting a particular sheet by name out of many sheets
     sheets = wb.sheetnames
-    print(sheets)
-
     worksheet = wb["Sheet1"]
-    print(worksheet)
-
     excel_data = []
-    # iterating over the rows and
-    # getting value from each cell in row
+    #example going through excel document 
     for row in worksheet.iter_rows():
         row_data = []
         for cell in row:
             row_data.append(str(cell.value))
         excel_data.append(row_data)
 
-    print(excel_data)
-
-    return HttpResponseRedirect('/limbs')
+    #TODO Actually populate "items_to_create" with excel data 
+   
+    items_to_create = [] #list of dictionary where each dictionary specifies an item
+    
+    sample_item = {
+        "name":"item",
+        "part_number":0,
+        "manufacturer": "Digikey",
+        "quantity_info":[
+            {"location":"location A", "quantity": 5},
+            {"location":"location B", "quantity": 3},
+        ]
+    }
+    #just add the same item 4 times...
+    for i in range(0, 4):
+        items_to_create.append(sample_item)
+        
+    return render(request, 
+        'limbs/sample_bulk_add.html', 
+        {"items_to_create":items_to_create})
 
 
 def item_search(request):
@@ -43,8 +54,7 @@ def item_search(request):
     part_no = None 
     manuf = None 
     if request.method == "GET":
-        print(request.GET)
-        print("WOOHOOO!")
+
         form_data = request.GET
         if len(form_data) > 1:
             name = form_data["item_name"]
@@ -116,14 +126,17 @@ def parse_form_create_item(form_data, item_id=None):
 
         #populating the through fields for locations
         for i in range(1, location_max_id+1):
-            key_e = "location_name_"+str(i)
+            key_e = "location_name_"+str(i) #don't actually use this one
             key_f = "location_quantity_"+str(i)
-
+            key_g = "id_location_name_"+str(i) #hidden field that stores the id
+            
+            print("WOO HOO\n");
+            print(form_data[key_g])
             if key_e not in form_data: continue
 
             item_quant = ItemQuantity(
                 item = temp_item,
-                location = Location.objects.get(name__iexact=form_data[key_e]),
+                location = Location.objects.get(id=form_data[key_g]),
                 quantity = form_data[key_f],
             )
             item_quant.save()
