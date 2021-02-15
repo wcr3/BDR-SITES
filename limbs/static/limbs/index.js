@@ -47,7 +47,7 @@ window.toggleDisplay = function toggleDisplay() {
     edit_button.innerHTML = "Display";
   }
   else{
-    edit_button.innerHTML = "Edit"; 
+    edit_button.innerHTML = "Edit";
   }
   for(var i = 0; i < paragraph.length; ++i){
     if(paragraph[i].style.display.localeCompare("none") == 0){
