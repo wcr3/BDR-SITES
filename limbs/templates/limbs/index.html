@@ -28,7 +28,41 @@
 -->
 <h2>Database</h2>
 
-<button type="button" onclick="item_popup(event, '{% url 'limbs:create_item' %}')">Create Item</button>
+{% if name or part_no or manuf%}
+
+Results for... {{name}} {{part_no}} {{manuf}}
+
+<form action="{% url 'limbs:item_search' %}">   
+    <input type="submit" value="Clear Search">
+ </form>
+
+
+{% else %}
+
+<form action="{% url 'limbs:item_search' %}" method="get">
+    <input name="item_name" type="text" placeholder="Name...">
+    <input name="item_part_no" type="number" placeholder="Part #...">
+    <input name="item_manufacturer" type="text" placeholder="Manufacturer...">
+    <input type="submit" value="Search">
+</form>
+
+<form action="{% url 'limbs:upload_excel' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file"
+           title="Upload excel file"
+           name="excel_file"
+           style="border: 1px solid black; padding: 5px;"
+           required="required">
+    <p>
+    <input type="submit"
+           value="Upload"
+           style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+</form>
+
+{% endif %}
+
+ 
+ <button type="button" onclick="item_popup(event, '{% url 'limbs:create_item' %}')">Create Item</button>
 
 <div id="item_tbl">
     {% include "./item_table.html" with item_list=item_list only %}
