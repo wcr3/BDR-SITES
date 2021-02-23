@@ -21,7 +21,7 @@
     so we can loop in the view via that. As we loop we can make a form_data which we can then 
     send to parse_form_create_item().
 -->
-<form onsubmit="return validateBulkForm()" action="{% url 'limbs:create_item' %}" method="post" id="create_bulk_item_form">
+<form onsubmit="return validateForm(false, true, true)" action="{% url 'limbs:create_item' %}" method="post" id="create_bulk_item_form">
     {% csrf_token %}
 </form>
 
@@ -69,40 +69,11 @@
                 <input required  form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_part_number" value="{{item.part_number}}">
             </th>
             <th>
-                <input required  list="manufacturers" form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_manufacturer_name" value="{{item.manufacturer}}">
+                <input required  id=manufacturer_name list="manufacturers" form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_manufacturer_name" value="{{item.manufacturer}}">
             </th>
         </tr>
         </table>
     </div>
-
-    <!-- <div class = "table" style="grid-column: span 1;">
-    <table id="supplier_table">
-        <tr>
-            <th>
-                Supplier
-            </th>
-            <th>
-                Supplier Part Number - Link
-            </th>
-            <th>
-                Cost
-            </th>
-        </tr>
-        {% for supplier_info in item.supplier_info %}
-        <tr>
-            <td>
-                <input required  list="suppliers" id=supplier_row_name form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_supplier_name_{{forloop.counter}}" value="{{supplier_info.supplier}}">
-            </td>
-            <td>
-                <input required  id=supplier_row form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_supplier_partno_{{forloop.counter}}" value="{{supplier_info.supplier_part_number}}"> - <input required  form="create_bulk_item_form" type="url" name="{{forloop.parentloop.counter}}_supplier_link_{{forloop.counter}}" value="{{supplier_info.link}}">
-            </td>
-            <td>
-                <input required  id=supplier_row form="create_bulk_item_form" type="number" name="{{forloop.parentloop.counter}}_supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
-                </td>
-        </tr>
-        {% endfor %}
-    </table>
-    </div> -->
 
     <div class = "table" style= "grid-column: span 1;">
     <table id="location_table">
