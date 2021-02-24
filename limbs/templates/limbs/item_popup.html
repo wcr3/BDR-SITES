@@ -1,6 +1,6 @@
 {% if item %}
 
-<form onsubmit="return validateForm()" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
+<form onsubmit="return validateForm(true, true, true)" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
     {% csrf_token %}
 </form>
 
@@ -126,7 +126,7 @@
                   <input required  form="edit_item_form" type="text" name="part_number" value="{{item.part_number}}">
               </th>
               <th>
-                  <input required  list="manufacturers" form="edit_item_form" type="text" name="manufacturer_name" value="{{item.manufacturer}}">
+                  <input required  id=manufacturer_name list="manufacturers" form="edit_item_form" type="text" name="manufacturer_name" value="{{item.manufacturer}}">
               </th>
           </tr>
         </table>

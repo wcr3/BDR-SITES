@@ -10,6 +10,27 @@
 {% endblock %}
 
 {% block content %}
+
+<datalist id="manufacturers">
+    {% for manufacturer in manufacturers %}
+        <option value="{{ manufacturer.name}}">
+    {% endfor %}
+</datalist>
+
+    
+<datalist id="locations">
+    {% for location in locations %}
+        <option data-id="{{location.id}}" value="{{location}}">
+    {% endfor %}
+</datalist>
+
+<datalist id="tags">
+    {% for tag in tags %}
+        <option data-id="{{tag.id}}" value="{{tag}}">
+    {% endfor %}
+</datalist>
+
+
 <h1>LIMBS</h1>
 <!--
 <h2>Add a Part, Tool, Subsytem, or Component</h2>
@@ -28,9 +49,9 @@
 -->
 <h2>Database</h2>
 
-{% if name or part_no or manuf%}
+{% if results_searched %}
 
-Results for... {{name}} {{part_no}} {{manuf}}
+Results...
 
 <form action="{% url 'limbs:item_search' %}">   
     <input type="submit" value="Clear Search">
@@ -42,7 +63,19 @@ Results for... {{name}} {{part_no}} {{manuf}}
 <form action="{% url 'limbs:item_search' %}" method="get">
     <input name="item_name" type="text" placeholder="Name...">
     <input name="item_part_no" type="number" placeholder="Part #...">
-    <input name="item_manufacturer" type="text" placeholder="Manufacturer...">
+    <input list="manufacturers" name="item_manufacturer" type="text" placeholder="Manufacturer...">
+    
+    <br>
+    <div id="insert_tags"> </div>
+    <input id="tag_input_multiple" list="tags" name="item_tags" type="text" multiple placeholder="Enter Item Tag...">
+    <button type="button" onclick="addElem('tag_input_multiple','insert_tags','tags')">Add Tag</button>
+
+    <br>
+    <div id="insert_locations"> </div>
+    <input id="location_input_multiple" list="locations" name="item_locations" type="text" placeholder="Enter Item Location..">
+    <button type="button" onclick="addElem('location_input_multiple','insert_locations','locations')">Add Location</button>
+
+    <br>
     <input type="submit" value="Search">
 </form>
 
