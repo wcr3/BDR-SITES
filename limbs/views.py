@@ -15,32 +15,34 @@ def upload_excel(request):
     # you may put validations here to check extension or file size
     wb = openpyxl.load_workbook(excel_file)
     # getting a particular sheet by name out of many sheets
+    ord_vect = {}
+    items_to_create = []
     sheets = wb.sheetnames
     worksheet = wb["Sheet1"]
-    excel_data = []
-    #example going through excel document
-    for row in worksheet.iter_rows():
-        row_data = []
-        for cell in row:
-            row_data.append(str(cell.value))
-        excel_data.append(row_data)
+    data = tuple(worksheet.rows)
+    for x in range (len(data[0])):
+        ord_vect.update({data[0][x].value.lower():x})
+    for x in range(len(data)):
+        if(x == 0):
+            continue
+        q_info = []
+        quantity_list = str(data[x][ord_vect["quantity"]].value).split(",")
+        location_list = str(data[x][ord_vect["location"]].value).split(",")
+        for y in range(len(quantity_list)):
+            q_info.append({"location":location_list[y], "quantity": quantity_list[y]})
+        temp_item = {
+            "name": data[x][ord_vect["name"]].value,
+            "part_number": data[x][ord_vect["partnumber"]].value,
+            "manufacturer": data[x][ord_vect["manufacturer"]].value,
+            "quantity_info": q_info
+        }
+        items_to_create.append(temp_item)
 
+    ##figure out the order of the sheets
+    excel_data = []
     #TODO Actually populate "items_to_create" with excel data
 
-    items_to_create = [] #list of dictionary where each dictionary specifies an item
 
-    sample_item = {
-        "name":"item",
-        "part_number":0,
-        "manufacturer": "Digikey",
-        "quantity_info":[
-            {"location":"location A", "quantity": 5},
-            {"location":"location B", "quantity": 3},
-        ]
-    }
-    #just add the same item 4 times...
-    for i in range(0, 4):
-        items_to_create.append(sample_item)
 
     manufacturers = Manufacturer.objects.all
     suppliers = Supplier.objects.all
@@ -227,7 +229,6 @@ def create_bulk_items(request):
     if request.method == 'POST':
         #change this data
         form_data = request.POST
-        print(form_data)
         location_max_id = -1
         for key in form_data.keys():
             if "location_name_" in key:
@@ -235,8 +236,6 @@ def create_bulk_items(request):
         item_list = form_data.getlist('_item_name')
         part_list = form_data.getlist('_part_number')
         man_list = form_data.getlist('_manufacturer_name')
-        print("these are the max ids\n")
-        print(location_max_id)
         for x in range(len(item_list)):
             sample_data = {
                 'item_name':item_list[x],
@@ -246,9 +245,9 @@ def create_bulk_items(request):
             for y in range(location_max_id):
                 loc = str(x+1) + '_location_name_' + str(y+1)
                 quant = str(x+1) + '_location_quantity_'+ str(y+1)
-                sample_data['id_location_name_' + str(y+1)] = y+4
+                id = 'id_'+str(x+1) + '_location_name_'+str(y+1)
+                sample_data['id_location_name_' + str(y+1)] = form_data[id]
                 sample_data['location_quantity_'+str(y+1)] = form_data[quant]
                 sample_data['location_name_'+str(y+1)] = form_data[loc]
             parse_form_create_item(sample_data)
-
         return HttpResponseRedirect('/limbs')

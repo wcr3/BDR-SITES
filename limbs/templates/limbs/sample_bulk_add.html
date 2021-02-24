@@ -21,7 +21,7 @@
     so we can loop in the view via that. As we loop we can make a form_data which we can then
     send to parse_form_create_item().
 -->
-<form onsubmit="return validateForm(false, true, true)" action="{% url 'limbs:create_item' %}" method="post" id="create_bulk_item_form">
+<form onsubmit="return validateForm(false, true, true)" action="{% url 'limbs:create_bulk_items' %}" method="post" id="create_bulk_item_form">
     {% csrf_token %}
 </form>
 
