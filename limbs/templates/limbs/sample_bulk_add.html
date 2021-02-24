@@ -14,14 +14,14 @@
 
 <!-- TODO: Need to write a function:validateBulkForm(), but don't worry about this for now...
     Need a new route: replace "limbs:create_item" with "limbs:create_bulk_items".
-    Write the new view functinoaliy for create_bulk_items(), It should repeatedely call 
-    parse_form_create_item() function in views.py. We will need to pass a form_data to that 
-    function which we can make. 
-    Note that all the field names here are pre_pended with an index "{{forloop.parentloop.counter}}", 
-    so we can loop in the view via that. As we loop we can make a form_data which we can then 
+    Write the new view functinoaliy for create_bulk_items(), It should repeatedely call
+    parse_form_create_item() function in views.py. We will need to pass a form_data to that
+    function which we can make.
+    Note that all the field names here are pre_pended with an index "{{forloop.parentloop.counter}}",
+    so we can loop in the view via that. As we loop we can make a form_data which we can then
     send to parse_form_create_item().
 -->
-<form onsubmit="return validateBulkForm()" action="{% url 'limbs:create_item' %}" method="post" id="create_bulk_item_form">
+<form onsubmit="return validateBulkForm()" action="{% url 'limbs:create_bulk_items' %}" method="post" id="create_bulk_item_form">
     {% csrf_token %}
 </form>
 

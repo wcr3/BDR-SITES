@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 import random
 # Create your views here.
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location
-from django.db.models import Q 
+from django.db.models import Q
 import openpyxl
 
 
@@ -16,43 +16,48 @@ def upload_excel(request):
     wb = openpyxl.load_workbook(excel_file)
     # getting a particular sheet by name out of many sheets
     sheets = wb.sheetnames
-    worksheet = wb["Sheet1"]
-    excel_data = []
-    #example going through excel document 
-    for row in worksheet.iter_rows():
-        row_data = []
-        for cell in row:
-            row_data.append(str(cell.value))
-        excel_data.append(row_data)
+    print(sheets)
+    # the specific work sheet we are working from
+    items = list()
+    for sheet_name in sheets:
+        worksheet = wb[sheet_name]
+        ord_vect = {}
+        for x in range(len(worksheet[1])):
+            ord_vect.update({str(worksheet[1][x].value).lower():x})
+        row_counter = 0
+        #example going through excel document
+        for row in worksheet.iter_rows():
+            if(row_counter == 0):
+                row_counter += 1
+                continue
+            name = str(row[ord_vect["name"]].value)
+            partno = str(row[ord_vect["partnumber"]].value)
+            man = str(row[ord_vect["manufacturer"]].value)
+            loc_list = str(row[ord_vect['location']].value).split(",")
+            quant_list = str(row[ord_vect['quantity']].value).split(",")
+            itemquantity = []
+            for x in range(0,len(loc_list)):
+                itemquantity.append({"location" : loc_list[x], "quantity" : quant_list[x]})
+            sample_item = {
+                "name": name,
+                "part_number": partno,
+                "manufacturer": man,
+                "quantity_info": itemquantity
+            }
+            items.append(sample_item)
 
-    #TODO Actually populate "items_to_create" with excel data 
-   
-    items_to_create = [] #list of dictionary where each dictionary specifies an item
-    
-    sample_item = {
-        "name":"item",
-        "part_number":0,
-        "manufacturer": "Digikey",
-        "quantity_info":[
-            {"location":"location A", "quantity": 5},
-            {"location":"location B", "quantity": 3},
-        ]
-    }
-    #just add the same item 4 times...
-    for i in range(0, 4):
-        items_to_create.append(sample_item)
-        
-    return render(request, 
-        'limbs/sample_bulk_add.html', 
-        {"items_to_create":items_to_create})
+
+    return render(request,
+        'limbs/sample_bulk_add.html',
+        {"items_to_create":items})
 
 
 def item_search(request):
-    model = Item 
+    model = Item
     item_list = Item.objects.all()
     name = None
-    part_no = None 
-    manuf = None 
+    part_no = None
+    manuf = None
     if request.method == "GET":
 
         form_data = request.GET
@@ -62,7 +67,7 @@ def item_search(request):
             manuf = form_data["item_manufacturer"]
 
             if name == "" and part_no == "" and manuf == "": #just pressed serach bar
-                item_list = Item.objects.all() 
+                item_list = Item.objects.all()
             elif Manufacturer.objects.filter(name__iexact=manuf).count() > 0:
                 manuf_obj = Manufacturer.objects.get(name__iexact=manuf)
                 item_list = Item.objects.filter(
@@ -73,8 +78,8 @@ def item_search(request):
                     Q(name=name) | Q(part_number=part_no)
                 )
 
-    return render(request, 
-        'limbs/index.html', 
+    return render(request,
+        'limbs/index.html',
         {"item_list":item_list,
         "name":name,
         "part_no":part_no,
@@ -90,15 +95,15 @@ def parse_form_create_item(form_data, item_id=None):
         )
         #TODO add stuff for tags
 
-        #add id 
+        #add id
         if item_id:
             temp_item.id = item_id
         #save the item
         temp_item.save()
 
         #for supplier and location table determine max id...
-        supplier_max_id = -1 
-        location_max_id = -1 
+        supplier_max_id = -1
+        location_max_id = -1
         for key in form_data.keys():
             if "supplier_name_" in key:
                 supplier_max_id = max(supplier_max_id, int(key[-1]))
@@ -129,9 +134,7 @@ def parse_form_create_item(form_data, item_id=None):
             key_e = "location_name_"+str(i) #don't actually use this one
             key_f = "location_quantity_"+str(i)
             key_g = "id_location_name_"+str(i) #hidden field that stores the id
-            
-            print("WOO HOO\n");
-            print(form_data[key_g])
+            if key_g not in form_data: continue
             if key_e not in form_data: continue
 
             item_quant = ItemQuantity(
@@ -149,13 +152,13 @@ def item_table(request, search):
 def item_popup(request, pk):
     item = Item.objects.get(id=pk)
     manufacturers = Manufacturer.objects.all
-    suppliers = Supplier.objects.all 
-    locations = Location.objects.all 
-    return render(request, 
-    'limbs/item_popup.html', 
+    suppliers = Supplier.objects.all
+    locations = Location.objects.all
+    return render(request,
+    'limbs/item_popup.html',
     {"item":item,
-    "manufacturers":manufacturers, 
-    "suppliers":suppliers, 
+    "manufacturers":manufacturers,
+    "suppliers":suppliers,
     "locations":locations})
 
 
@@ -167,7 +170,7 @@ def edit_item(request, pk):
         #delete original item
         Item.objects.filter(id=pk).delete()
 
-        #make new item with same id 
+        #make new item with same id
         if "Edit" in form_data.keys():
             parse_form_create_item(form_data, item_id=pk)
 
@@ -186,10 +189,39 @@ def create_item(request):
         return HttpResponseRedirect('/limbs')
     else:
         manufacturers = Manufacturer.objects.all
-        suppliers = Supplier.objects.all 
-        locations = Location.objects.all 
-        return render(request, 
-        'limbs/create_item.html', 
-        {"manufacturers":manufacturers, 
-        "suppliers":suppliers, 
+        suppliers = Supplier.objects.all
+        locations = Location.objects.all
+        return render(request,
+        'limbs/create_item.html',
+        {"manufacturers":manufacturers,
+        "suppliers":suppliers,
         "locations":locations})
+def create_bulk_items(request):
+    if request.method == 'POST':
+        #change this data
+        form_data = request.POST
+        print(form_data)
+        location_max_id = -1
+        for key in form_data.keys():
+            if "location_name_" in key:
+                location_max_id = max(location_max_id, int(key[-1]))
+        item_list = form_data.getlist('_item_name')
+        part_list = form_data.getlist('_part_number')
+        man_list = form_data.getlist('_manufacturer_name')
+        print("these are the max ids\n")
+        print(location_max_id)
+        for x in range(len(item_list)):
+            sample_data = {
+                'item_name':item_list[x],
+                'part_number': part_list[x],
+                'manufacturer_name': man_list[x],
+            }
+            for y in range(location_max_id):
+                loc = str(x+1) + '_location_name_' + str(y+1)
+                quant = str(x+1) + '_location_quantity_'+ str(y+1)
+                sample_data['id_location_name_' + str(y+1)] = y+4
+                sample_data['location_quantity_'+str(y+1)] = form_data[quant]
+                sample_data['location_name_'+str(y+1)] = form_data[loc]
+            parse_form_create_item(sample_data)
+
+        return HttpResponseRedirect('/limbs')
