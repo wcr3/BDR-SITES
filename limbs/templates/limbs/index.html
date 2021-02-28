@@ -24,6 +24,12 @@
     {% endfor %}
 </datalist>
 
+<datalist id="suppliers">
+    {% for supplier in suppliers %}
+        <option data-id="{{supplier.id}}" value="{{supplier}}">
+    {% endfor %}
+</datalist>
+
 <datalist id="tags">
     {% for tag in tags %}
         <option data-id="{{tag.id}}" value="{{tag}}">
@@ -32,22 +38,8 @@
 
 
 <h1>LIMBS</h1>
-<!--
-<h2>Add a Part, Tool, Subsytem, or Component</h2>
-<form id="item_sub_frm" action="/submit/item">
-    Name: <input type="text" name="name"><br>
-    Location: <input type="text" name="loc">
-</form>
-<h2>Add a Cabinet, Shelf, Table, or Floor</h2>
-<div>
-    <form id="sheet_submit_form">
-        <label for="sheet_submit">Select spreadsheet for submission:</label>
-        <input type="file" id="sheet_submit" name="sheet_submit" accept=".txt,text/plain,.xls,.xlsx,.xlsm,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv,text/csv">
-        <input type="submit" value="Upload">
-    </form>
-</div>
--->
-<h2>Database</h2>
+
+<h2>Database Search</h2>
 
 {% if results_searched %}
 
@@ -61,23 +53,39 @@ Results...
 {% else %}
 
 <form action="{% url 'limbs:item_search' %}" method="get">
-    <input name="item_name" type="text" placeholder="Name...">
-    <input name="item_part_no" type="number" placeholder="Part #...">
-    <input list="manufacturers" name="item_manufacturer" type="text" placeholder="Manufacturer...">
     
+    <input style="display: block" id="general_search" name="general_search" type="text" placeholder="Search...">
     <br>
-    <div id="insert_tags"> </div>
-    <input id="tag_input_multiple" list="tags" name="item_tags" type="text" multiple placeholder="Enter Item Tag...">
-    <button type="button" onclick="addElem('tag_input_multiple','insert_tags','tags')">Add Tag</button>
+    <button id="advanced_search_button" type="button" onclick="show_advanced_options()"> Show Advanced Options </button>
 
-    <br>
-    <div id="insert_locations"> </div>
-    <input id="location_input_multiple" list="locations" name="item_locations" type="text" placeholder="Enter Item Location..">
-    <button type="button" onclick="addElem('location_input_multiple','insert_locations','locations')">Add Location</button>
+    <div style="display: none" id="advanced_search"> 
 
-    <br>
+        <input name="item_name" type="text" placeholder="Name...">
+        <input name="item_part_no" type="number" placeholder="Part #...">
+        <input list="manufacturers" name="item_manufacturer" type="text" placeholder="Manufacturer...">
+        
+        <br>
+        <div id="insert_tags"> </div>
+        <input id="tag_input_multiple" list="tags" name="item_tags" type="text" multiple placeholder="Enter Item Tag...">
+        <button type="button" onclick="addElem('tag_input_multiple','insert_tags','tags')">Add Tag</button>
+
+        <br>
+        <div id="insert_locations"> </div>
+        <input id="location_input_multiple" list="locations" name="item_locations" type="text" placeholder="Enter Item Location...">
+        <button type="button" onclick="addElem('location_input_multiple','insert_locations','locations')">Add Location</button>
+
+        <br>
+        <div id="insert_suppliers"> </div>
+        <input id="supplier_input_multiple" list="suppliers" name="item_suppliers" type="text" placeholder="Enter Supplier...">
+        <button type="button" onclick="addElem('supplier_input_multiple','insert_suppliers','suppliers')">Add Supplier</button>
+
+    </div>
+
     <input type="submit" value="Search">
+
 </form>
+
+<h2>Upload Excel</h2>
 
 <form action="{% url 'limbs:upload_excel' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -95,7 +103,12 @@ Results...
 {% endif %}
 
  
+
+<h2>Create</h2>
+
  <button type="button" onclick="item_popup(event, '{% url 'limbs:create_item' %}')">Create Item</button>
+
+ <h2>Items</h2>
 
 <div id="item_tbl">
     {% include "./item_table.html" with item_list=item_list only %}

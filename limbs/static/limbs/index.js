@@ -93,6 +93,23 @@ window.deleteRowTable = function deleteRowTable(table_name, index){
     table.deleteRow(index);
 }
 
+window.show_advanced_options = function show_advanced_options(){
+    var advanced_search = document.getElementById("advanced_search");
+    var gen_search = document.getElementById("general_search");
+    var adv_search = document.getElementById("advanced_search_button")
+    
+    gen_search.value = ""
+    if (advanced_search.style.display === "none") {
+        advanced_search.style.display = "block";
+        gen_search.style.display = "none";
+        adv_search.textContent = "Basic Search"
+      } else {
+        advanced_search.style.display = "none";
+        gen_search.style.display = "block";
+        adv_search.textContent = "Show Advanced Options"
+      }
+}
+
 window.validateForm = function validateForm(validate_supplier, validate_manufacturer, validate_location){
 
  

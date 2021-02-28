@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import random
-# Create your views here.
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location, Tag
-from django.db.models import Q
+from django.db.models import Q, CharField
 import openpyxl
 
 
@@ -59,52 +58,95 @@ def upload_excel(request):
 
 
 def item_search(request):
-    model = Item
     item_list = Item.objects.all()
     results_searched = False
 
     if request.method == "GET":
         form_data = request.GET
-        if len(form_data) > 1:
 
-            results_searched = True
-            name = form_data["item_name"]
-            part_no = form_data["item_part_no"]
-            manuf = form_data["item_manufacturer"]
+        
+        if "general_search" in form_data and form_data["general_search"] != "":
+            #regular search 
+            results_searched = True 
+            search_fields = form_data["general_search"].split(" ")
+            print(search_fields)
+            qs = Q()
+            for search_field in search_fields:
 
-            def get_ids_for_prefix(form_data, prefix_value):
-                lst_of_ids = []
-                for key in form_data.keys():
-                    if prefix_value in key:
-                        lst_of_ids.append(form_data[key])
-                return lst_of_ids
+                big_q = None 
 
-            tag_ids = get_ids_for_prefix(form_data, "tag_input_multiple_")
-            location_ids = get_ids_for_prefix(form_data, "location_input_multiple_")
+                def get_query_for_model(model):
+                    fields = [f for f in model._meta.fields if isinstance(f, CharField)]
+                    queries = [Q(**{f.name+"__icontains": search_field}) for f in fields]
+                    return queries
+
+                def retrieve_objs_for_model(model):
+                    qs = Q()
+                    queries = get_query_for_model(model)
+                    for query in queries:
+                        qs = qs | query
+                    return model.objects.filter(qs)
+
+                    
+                big_q = get_query_for_model(Item)
+                big_q += [Q(manufacturer__in=retrieve_objs_for_model(Manufacturer))]
+                big_q += [Q(quantities__in=retrieve_objs_for_model(Location))]
+                big_q += [Q(tags__in=retrieve_objs_for_model(Tag))]
+                big_q += [Q(suppliers__in=retrieve_objs_for_model(Supplier))]
+
+                for query in big_q:
+                    qs = qs | query
+
+            item_list = Item.objects.filter(qs)
 
 
-            if name == "" and part_no == "" and manuf == "" and len(tag_ids) == 0 and len(location_ids) == 0: #just pressed serach bar
-                item_list = Item.objects.all()
+        else: 
+            #advanced search 
+            if len(form_data) > 1:
 
-            if name != "":
-                item_list = item_list.filter(name = name)
+                results_searched = True
+                name = form_data["item_name"]
+                part_no = form_data["item_part_no"]
+                manuf = form_data["item_manufacturer"]
 
-            if manuf != "":
-                item_list = item_list.filter(manufacturer=Manufacturer.objects.get(name__iexact=manuf))
+                def get_ids_for_prefix(form_data, prefix_value):
+                    lst_of_ids = []
+                    for key in form_data.keys():
+                        if prefix_value in key:
+                            lst_of_ids.append(form_data[key])
+                    return lst_of_ids
 
-            if part_no != "":
-                item_list = item_list.filter(part_number=part_no)
+                tag_ids = get_ids_for_prefix(form_data, "tag_input_multiple_")
+                location_ids = get_ids_for_prefix(form_data, "location_input_multiple_")
+                supplier_ids = get_ids_for_prefix(form_data, "supplier_input_multiple_")
 
-            if len(tag_ids) > 0:
-                item_list = item_list.filter(tags__in=tag_ids)
+                if name == "" and part_no == "" and manuf == "" and len(tag_ids) == 0 and len(location_ids) == 0: #just pressed serach bar
+                    item_list = Item.objects.all()
 
-            if len(location_ids) > 0:
-                item_list = item_list.filter(quantities__in=location_ids)
+                if name != "":
+                    item_list = item_list.filter(name = name)
+
+                if manuf != "":
+                    item_list = item_list.filter(manufacturer=Manufacturer.objects.get(name__iexact=manuf))
+
+                if part_no != "":
+                    item_list = item_list.filter(part_number=part_no)
+
+                if len(tag_ids) > 0:
+                    item_list = item_list.filter(tags__in=tag_ids)
+
+                if len(location_ids) > 0:
+                    item_list = item_list.filter(quantities__in=location_ids)
+
+                if len(supplier_ids) > 0:
+                    item_list = item_list.filter(suppliers__in=supplier_ids)
+
 
 
     manufacturers = Manufacturer.objects.all
     locations = Location.objects.all
     tags = Tag.objects.all
+    suppliers = Supplier.objects.all
 
     return render(request,
         'limbs/index.html',
@@ -112,23 +154,39 @@ def item_search(request):
         "results_searched":results_searched,
         "manufacturers":manufacturers,
         "locations":locations,
+        "suppliers":suppliers,
         "tags":tags,
         })
 
-def parse_form_create_item(form_data, item_id=None):
-        #make new item
-        temp_item = Item(
-            name=form_data["item_name"],
-            part_number=form_data["part_number"],
-            manufacturer=Manufacturer.objects.get(name__iexact=form_data["manufacturer_name"]) #search by name
-        )
-        #TODO add stuff for tags
+def parse_form_create_item(form_data, item_id=None, from_bulk=False):
+        name = form_data["item_name"]
+        manufacturer_obj = Manufacturer.objects.get(name__iexact=form_data["manufacturer_name"])
+        part_number = form_data["part_number"]
+        
+        #before we create item see if it exists already... 
+        already_exists = False 
+        if (from_bulk):
+            item_list = Item.objects.all().filter(name=name,manufacturer=manufacturer_obj) #IGNORE PART NUMBER 
+            if len(item_list) >= 1:
+                temp_item = item_list[0]
+                already_exists = True 
 
-        #add id
-        if item_id:
-            temp_item.id = item_id
-        #save the item
-        temp_item.save()
+
+        if not already_exists:
+            #make new item
+            temp_item = Item(
+                name=name,
+                part_number=part_number,
+                manufacturer=manufacturer_obj
+            )
+            #TODO add stuff for tags
+
+            #add id
+            if item_id:
+                temp_item.id = item_id
+            #save the item
+            temp_item.save()
+
 
         #for supplier and location table determine max id...
         supplier_max_id = -1
@@ -166,6 +224,14 @@ def parse_form_create_item(form_data, item_id=None):
 
             if key_e not in form_data: continue
 
+            #override if object already exists 
+            if from_bulk and already_exists:
+                matching_locs = ItemQuantity.objects.all().filter(item=temp_item,location=Location.objects.get(id=form_data[key_g]))
+                if len(matching_locs) > 0:
+                    matching_locs[0].quantity += int(form_data[key_f])
+                    matching_locs[0].save()
+                    continue 
+            
             item_quant = ItemQuantity(
                 item = temp_item,
                 location = Location.objects.get(id=form_data[key_g]),
@@ -225,6 +291,7 @@ def create_item(request):
         {"manufacturers":manufacturers,
         "suppliers":suppliers,
         "locations":locations})
+
 def create_bulk_items(request):
     if request.method == 'POST':
         #change this data
@@ -249,5 +316,5 @@ def create_bulk_items(request):
                 sample_data['id_location_name_' + str(y+1)] = form_data[id]
                 sample_data['location_quantity_'+str(y+1)] = form_data[quant]
                 sample_data['location_name_'+str(y+1)] = form_data[loc]
-            parse_form_create_item(sample_data)
+            parse_form_create_item(sample_data, from_bulk=True)
         return HttpResponseRedirect('/limbs')
