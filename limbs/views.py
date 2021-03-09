@@ -25,15 +25,31 @@ def upload_excel(request):
         if(x == 0):
             continue
         q_info = []
+        t_info = []
+        exists_val = False
+        name = data[x][ord_vect["name"]].value
+        part_num = data[x][ord_vect["partnumber"]].value
+        manufacturer = data[x][ord_vect["manufacturer"]].value
+        manufacturer_obj = Manufacturer.objects.get(name__iexact=manufacturer)
+        item_comp = Item.objects.all().filter(name=name,manufacturer=manufacturer_obj)
+        if(len(item_comp)) >= 1:
+            exists_val = True
+        # item_comp = Item.objects.all().filter(name = )
         quantity_list = str(data[x][ord_vect["quantity"]].value).split(",")
         location_list = str(data[x][ord_vect["location"]].value).split(",")
+        tag_list = str(data[x][ord_vect["tags"]].value).split(",")
+
         for y in range(len(quantity_list)):
             q_info.append({"location":location_list[y], "quantity": quantity_list[y]})
+        for y in range(len(tag_list)):
+            t_info.append(tag_list[y])
         temp_item = {
-            "name": data[x][ord_vect["name"]].value,
-            "part_number": data[x][ord_vect["partnumber"]].value,
-            "manufacturer": data[x][ord_vect["manufacturer"]].value,
-            "quantity_info": q_info
+            "name": name,
+            "part_number": part_num,
+            "manufacturer": manufacturer,
+            "quantity_info": q_info,
+            "exists": exists_val,
+            "tags": tag_list
         }
         items_to_create.append(temp_item)
 
@@ -46,13 +62,15 @@ def upload_excel(request):
     manufacturers = Manufacturer.objects.all
     suppliers = Supplier.objects.all
     locations = Location.objects.all
+    tags = Tag.objects.all
 
     return render(request,
         'limbs/sample_bulk_add.html',
         {"items_to_create":items_to_create,
         "manufacturers":manufacturers,
         "suppliers":suppliers,
-        "locations":locations})
+        "locations":locations,
+        "tags":tags})
 
 
 
@@ -64,16 +82,16 @@ def item_search(request):
     if request.method == "GET":
         form_data = request.GET
 
-        
+
         if "general_search" in form_data and form_data["general_search"] != "":
-            #regular search 
-            results_searched = True 
+            #regular search
+            results_searched = True
             search_fields = form_data["general_search"].split(" ")
             print(search_fields)
             qs = Q()
             for search_field in search_fields:
 
-                big_q = None 
+                big_q = None
 
                 def get_query_for_model(model):
                     fields = [f for f in model._meta.fields if isinstance(f, CharField)]
@@ -87,7 +105,7 @@ def item_search(request):
                         qs = qs | query
                     return model.objects.filter(qs)
 
-                    
+
                 big_q = get_query_for_model(Item)
                 big_q += [Q(manufacturer__in=retrieve_objs_for_model(Manufacturer))]
                 big_q += [Q(quantities__in=retrieve_objs_for_model(Location))]
@@ -100,8 +118,8 @@ def item_search(request):
             item_list = Item.objects.filter(qs)
 
 
-        else: 
-            #advanced search 
+        else:
+            #advanced search
             if len(form_data) > 1:
 
                 results_searched = True
@@ -162,14 +180,14 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
         name = form_data["item_name"]
         manufacturer_obj = Manufacturer.objects.get(name__iexact=form_data["manufacturer_name"])
         part_number = form_data["part_number"]
-        
-        #before we create item see if it exists already... 
-        already_exists = False 
+
+        #before we create item see if it exists already...
+        already_exists = False
         if (from_bulk):
-            item_list = Item.objects.all().filter(name=name,manufacturer=manufacturer_obj) #IGNORE PART NUMBER 
+            item_list = Item.objects.all().filter(name=name,manufacturer=manufacturer_obj) #IGNORE PART NUMBER
             if len(item_list) >= 1:
                 temp_item = item_list[0]
-                already_exists = True 
+                already_exists = True
 
 
         if not already_exists:
@@ -224,14 +242,14 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
 
             if key_e not in form_data: continue
 
-            #override if object already exists 
+            #override if object already exists
             if from_bulk and already_exists:
                 matching_locs = ItemQuantity.objects.all().filter(item=temp_item,location=Location.objects.get(id=form_data[key_g]))
                 if len(matching_locs) > 0:
                     matching_locs[0].quantity += int(form_data[key_f])
                     matching_locs[0].save()
-                    continue 
-            
+                    continue
+
             item_quant = ItemQuantity(
                 item = temp_item,
                 location = Location.objects.get(id=form_data[key_g]),

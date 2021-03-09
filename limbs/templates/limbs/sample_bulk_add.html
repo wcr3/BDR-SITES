@@ -34,12 +34,18 @@
     {% endfor %}
 </datalist>
 
+<datalist id="tags">
+    {% for tag in tags %}
+        <option value="{{tag.name}}">
+    {% endfor %}
+</datalist>
+
 <div id="hidden_container"></div>
 
-
+<div style = "display :grid; grid-template-columns: 1fr 1fr;">
 {% for item in items_to_create %}
 
-    <div class = "table" style = "grid-column-start: 1; grid-column: span 3;">
+  <div class = "table" style = "grid-column: span 1; justify-self: start; padding: 10px;">
         <table id = "name_table">
         <tr>
             <th>
@@ -65,6 +71,15 @@
         </tr>
         </table>
     </div>
+    <div style = "grid-column: span 1; justify-self: start; align-self: center">
+    {% if item.name %}
+      <p>
+         {{item.name}} already exists
+      </p>
+    {% else %}
+    {% endif %}
+  </div>
+
 
     <div class = "table" style= "grid-column: span 1;">
     <table id="location_table">
@@ -83,15 +98,33 @@
             </td>
             <td>
                 <input required  id=quantity_row form="create_bulk_item_form" type="number" name="{{forloop.parentloop.counter}}_location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
+                <button form="create_bulk_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
             </td>
+            {% endfor %}
         </tr>
-        {% endfor %}
     </table>
     </div>
 
-    <hr style="width:50%;text-align:left;margin-left:0">
+    <div class = "table" style="grid-column: span 1;">
+      <table id = "tag_table">
+        <tr>
+          <th>
+            Tags
+          </th>
+        </tr>
+        {% for tag_info in item.tags %}
+        <tr>
+          <td>
+            <input required list = "tags"  id=tag_row form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_tag_{{forloop.counter}}" value="{{tag_info}}">
+            <button form="create_bulk_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
 
 {% endfor %}
+
 
 
 
@@ -99,6 +132,7 @@
     <input type="submit" form="create_bulk_item_form" name="Edit" value="Bulk Add">
     <input type="submit" form="create_bulk_item_form" name="Delete" value="Exit">
 </div>
+<hr style="height:1px; border:none; color:#000; background-color:#000;">
 
-
+</div>
 {% endblock %}
