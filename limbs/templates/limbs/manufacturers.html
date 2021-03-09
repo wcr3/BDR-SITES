@@ -1,0 +1,23 @@
+{% extends "shared/base.html" %}
+
+{% load static %}
+
+{% block title %}LIMBS{% endblock %}
+{% block header %}
+<script type="module" src="{% static 'limbs/index.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'limbs/manufacturers.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h1>Manufacturers</h1>
+
+<h2>Database</h2>
+
+<button type="button" onclick="manufacturer_popup(event, '{% url 'limbs:create_manufacturer' %}')">Create Manufacturer</button>
+
+<div id="manufacturer_tbl">
+    {% include "./manufacturer_table.html" with manufacturer_list=manufacturer_list only %}
+</div>
+
+{% endblock %}

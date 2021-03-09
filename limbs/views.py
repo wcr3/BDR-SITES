@@ -5,14 +5,15 @@ import random
 from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location, Tag
 
 def parse_form_create_item(form_data, item_id=None):
-        print(form_data)
-        print(form_data.keys())
-        #make new item
+
         temp_item = Item(
+
             name=form_data["item_name"],
             part_number=form_data["part_number"],
             manufacturer=Manufacturer.objects.get(name__iexact=form_data["manufacturer_name"]) #search by name
+
         )
+
         #add id 
         if item_id:
             temp_item.id = item_id
@@ -199,7 +200,8 @@ def location_table(request):
 def location_popup(request, pk):
 
     location = Location.objects.get(id=pk)
-    locations = Locations.objects.all
+    locations = Location.objects.all
+    print(locations)
     return render(request, 
     'limbs/location_popup.html', {
         'location': location, "locations": locations
@@ -225,10 +227,15 @@ def create_location(request):
 
 def parse_form_create_location(form_data, location_id=None):
 
-    temp_location = Location(
-        name=form_data["location_name"],
-        # parent=form_data["location_parent"],
-    )
+    if form_data["location_parent"] == '':
+        temp_location = Location (
+            name = form_data["location_name"]
+        )
+    else:
+        temp_location = Location(
+            name=form_data["location_name"],
+            parent = Location.objects.get(name__iexact=form_data["location_parent"])
+        )
 
     if location_id:
         temp_location.id = location_id
@@ -250,3 +257,108 @@ def edit_location(request, pk):
 
     #redirect to home page
     return HttpResponseRedirect('/limbs/location_list')
+
+def tag_popup(request, pk):
+
+    tag = Tag.objects.get(id=pk)
+    return render(request, 
+    'limbs/tag_popup.html', {
+        'tag': tag
+    })
+
+def create_tag(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_tag(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/tag_list')
+    else:
+        tags = Tag.objects.all
+        return render(request, 
+        'limbs/create_tag.html', {"tags":tags})
+
+def parse_form_create_tag(form_data, tag_id=None):
+
+    temp_tag = Tag(
+        name=form_data["tag_name"],
+    )
+
+    if tag_id:
+        temp_tag.id = tag_id
+
+    #save the item
+    temp_tag.save()
+
+def edit_tag(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Tag.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_tag(form_data, tag_id=pk)
+    
+    return HttpResponseRedirect('/limbs/tag_list')
+
+def manufacturer_popup(request, pk):
+
+    manufacturer = Manufacturer.objects.get(id=pk)
+    return render(request, 
+    'limbs/manufacturer_popup.html', {
+        'manufacturer': manufacturer
+    })
+
+def create_manufacturer(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_manufacturer(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/manufacturer_list')
+    else:
+        manufacturers = Manufacturer.objects.all
+        return render(request, 
+        'limbs/create_manufacturer.html', {"manufacturers":manufacturers})
+
+def parse_form_create_manufacturer(form_data, manufacturer_id=None):
+
+    temp_manufacturer = Manufacturer(
+        name=form_data["manufacturer_name"],
+        link=form_data["manufacturer_link"]
+    )
+
+    if manufacturer_id:
+        temp_manufacturer.id = manufacturer_id
+
+    #save the item
+    temp_manufacturer.save()
+
+def edit_manufacturer(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Manufacturer.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_manufacturer(form_data, manufacturer_id=pk)
+    
+    return HttpResponseRedirect('/limbs/manufacturer_list')

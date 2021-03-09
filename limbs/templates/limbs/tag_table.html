@@ -1,0 +1,10 @@
+<table>
+    <tr>
+        <th>Name</th>
+    </tr>
+    {% for tag in tag_list %}
+    <tr onclick="tag_popup(event, '{% url 'limbs:tag_popup' tag.id %}')"> 
+        <td>{{tag.name}}</td>
+    </tr>
+    {% endfor %}
+</table>

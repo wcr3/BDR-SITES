@@ -1,0 +1,25 @@
+
+<form action="{% url 'limbs:create_tag' %}" method="post" id="create_tag_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <table>
+        <tr>
+            <th>
+                Name
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input form="create_tag_form" type="text" name="tag_name">
+            </th>
+        </tr>
+<!-- </div> -->
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <input type="submit" form="create_tag_form" value="Submit">
+<!-- </div> -->
+</div>
