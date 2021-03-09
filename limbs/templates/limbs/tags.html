@@ -1,0 +1,36 @@
+{% extends "shared/base.html" %}
+
+{% load static %}
+
+{% block title %}LIMBS{% endblock %}
+{% block header %}
+<script type="module" src="{% static 'limbs/index.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'limbs/tags.css' %}">
+{% endblock %}
+ 
+{% block content %}
+<h1>Tags</h1>
+<!--
+<h2>Add a Part, Tool, Subsytem, or Component</h2>
+<form id="item_sub_frm" action="/submit/item">
+    Name: <input type="text" name="name"><br>
+    Location: <input type="text" name="loc">
+</form>
+<h2>Add a Cabinet, Shelf, Table, or Floor</h2>
+<div>
+    <form id="sheet_submit_form">
+        <label for="sheet_submit">Select spreadsheet for submission:</label>
+        <input type="file" id="sheet_submit" name="sheet_submit" accept=".txt,text/plain,.xls,.xlsx,.xlsm,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv,text/csv">
+        <input type="submit" value="Upload">
+    </form>
+</div>
+-->
+<h2>Database</h2>
+
+<button type="button" onclick="tag_popup(event, '{% url 'limbs:create_tag' %}')">Create Tag</button>
+
+<div id="tag_tbl">
+    {% include "./tag_table.html" with tag_list=tag_list only %}
+</div>
+
+{% endblock %}

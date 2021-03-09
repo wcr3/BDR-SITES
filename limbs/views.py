@@ -209,11 +209,14 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
         #for supplier and location table determine max id...
         supplier_max_id = -1
         location_max_id = -1
+        tag_max_id = -1 
         for key in form_data.keys():
             if "supplier_name_" in key:
                 supplier_max_id = max(supplier_max_id, int(key[-1]))
             if "location_name_" in key:
                 location_max_id = max(location_max_id, int(key[-1]))
+            if "tag_name_" in key:
+                tag_max_id = max(tag_max_id, int(key[-1]))
 
         #populating the through fields for suppliers
         for i in range(1, supplier_max_id+1):
@@ -232,6 +235,7 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
                 link = form_data[key_c],
                 cost = "{:.2f}".format(float(form_data[key_d])),
             )
+            print(item_sup)
             item_sup.save()
 
         #populating the through fields for locations
@@ -255,25 +259,38 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
                 location = Location.objects.get(id=form_data[key_g]),
                 quantity = form_data[key_f],
             )
+            print(item_quant)
             item_quant.save()
 
+        for i in range(1, tag_max_id+1):
+            key_g = "tag_name_" + str(i)
+
+            if key_g not in form_data: continue
+
+            limbs_tag = Tag.objects.get(name__iexact=form_data[key_g])
+
+            temp_item.tags.add(limbs_tag)        
 
 def item_table(request, search):
     item_list = Item.objects
+    print("Hello")
+    print(item_list)
     return render(request, 'limbs/item_table.html', {'item_list': item_list})
 
 def item_popup(request, pk):
     item = Item.objects.get(id=pk)
+    print(item)
     manufacturers = Manufacturer.objects.all
-    suppliers = Supplier.objects.all
+    suppliers = Supplier.objects.all 
     locations = Location.objects.all
-    return render(request,
-    'limbs/item_popup.html',
+    tags = Tag.objects.all
+    return render(request, 
+    'limbs/item_popup.html', 
     {"item":item,
-    "manufacturers":manufacturers,
-    "suppliers":suppliers,
-    "locations":locations})
-
+    "manufacturers":manufacturers, 
+    "suppliers":suppliers, 
+    "locations":locations,
+    "tags":tags})
 
 def edit_item(request, pk):
 
@@ -295,6 +312,8 @@ def create_item(request):
 
         form_data = request.POST
 
+        print(form_data)
+
         #make new item
         parse_form_create_item(form_data)
 
@@ -302,13 +321,15 @@ def create_item(request):
         return HttpResponseRedirect('/limbs')
     else:
         manufacturers = Manufacturer.objects.all
-        suppliers = Supplier.objects.all
+        suppliers = Supplier.objects.all 
         locations = Location.objects.all
-        return render(request,
-        'limbs/create_item.html',
-        {"manufacturers":manufacturers,
-        "suppliers":suppliers,
-        "locations":locations})
+        tags = Tag.objects.all
+        return render(request, 
+        'limbs/create_item.html', 
+        {"manufacturers":manufacturers, 
+        "suppliers":suppliers, 
+        "locations":locations,
+        "tags":tags})
 
 def create_bulk_items(request):
     if request.method == 'POST':
@@ -336,3 +357,231 @@ def create_bulk_items(request):
                 sample_data['location_name_'+str(y+1)] = form_data[loc]
             parse_form_create_item(sample_data, from_bulk=True)
         return HttpResponseRedirect('/limbs')
+
+
+# Pulls suppliers from DB to display in supplier_table.html
+def supplier_table(request):
+    supplier_list = Supplier.objects.all()
+    return render(request, 'limbs/supplier_table.html', {'supplier_list': supplier_list})
+
+def supplier_popup(request, pk):
+
+    supplier = Supplier.objects.get(id=pk)
+    print(supplier)
+    return render(request, 
+    'limbs/supplier_popup.html', {"supplier": supplier})
+
+def edit_supplier(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Supplier.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_supplier(form_data, supplier_id=pk)
+
+    #redirect to home page
+    return HttpResponseRedirect('/limbs/supplier_list')
+
+def create_supplier(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_supplier(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/supplier_list')
+    else:
+        return render(request, 
+        'limbs/create_supplier.html')
+
+def parse_form_create_supplier(form_data, supplier_id=None):
+
+        temp_supplier = Supplier(
+            name=form_data["supplier_name"],
+            link=form_data["supplier_link"],
+        )
+
+        if supplier_id:
+            temp_supplier.id = supplier_id
+
+        #save the item
+        temp_supplier.save()
+
+def location_table(request):
+    location_list = Location.objects.all()
+    return render(request, 'limbs/location_table.html', {'location_list':location_list})
+
+def location_popup(request, pk):
+
+    location = Location.objects.get(id=pk)
+    locations = Location.objects.all
+    print(locations)
+    return render(request, 
+    'limbs/location_popup.html', {
+        'location': location, "locations": locations
+    })
+
+def create_location(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_location(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/location_list')
+    else:
+        locations = Location.objects.all
+        return render(request, 
+        'limbs/create_location.html', {"locations":locations})
+
+def parse_form_create_location(form_data, location_id=None):
+
+    if form_data["location_parent"] == '':
+        temp_location = Location (
+            name = form_data["location_name"]
+        )
+    else:
+        temp_location = Location(
+            name=form_data["location_name"],
+            parent = Location.objects.get(name__iexact=form_data["location_parent"])
+        )
+
+    if location_id:
+        temp_location.id = location_id
+
+    #save the item
+    temp_location.save()
+
+def edit_location(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Location.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_location(form_data, location_id=pk)
+
+    #redirect to home page
+    return HttpResponseRedirect('/limbs/location_list')
+
+def tag_popup(request, pk):
+
+    tag = Tag.objects.get(id=pk)
+    return render(request, 
+    'limbs/tag_popup.html', {
+        'tag': tag
+    })
+
+def create_tag(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_tag(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/tag_list')
+    else:
+        tags = Tag.objects.all
+        return render(request, 
+        'limbs/create_tag.html', {"tags":tags})
+
+def parse_form_create_tag(form_data, tag_id=None):
+
+    temp_tag = Tag(
+        name=form_data["tag_name"],
+    )
+
+    if tag_id:
+        temp_tag.id = tag_id
+
+    #save the item
+    temp_tag.save()
+
+def edit_tag(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Tag.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_tag(form_data, tag_id=pk)
+    
+    return HttpResponseRedirect('/limbs/tag_list')
+
+def manufacturer_popup(request, pk):
+
+    manufacturer = Manufacturer.objects.get(id=pk)
+    return render(request, 
+    'limbs/manufacturer_popup.html', {
+        'manufacturer': manufacturer
+    })
+
+def create_manufacturer(request):
+
+    if request.method == 'POST':
+
+        form_data = request.POST
+
+        print(form_data)
+
+        #make new supplier
+        parse_form_create_manufacturer(form_data)
+
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/manufacturer_list')
+    else:
+        manufacturers = Manufacturer.objects.all
+        return render(request, 
+        'limbs/create_manufacturer.html', {"manufacturers":manufacturers})
+
+def parse_form_create_manufacturer(form_data, manufacturer_id=None):
+
+    temp_manufacturer = Manufacturer(
+        name=form_data["manufacturer_name"],
+        link=form_data["manufacturer_link"]
+    )
+
+    if manufacturer_id:
+        temp_manufacturer.id = manufacturer_id
+
+    #save the item
+    temp_manufacturer.save()
+
+def edit_manufacturer(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+
+        #delete original item
+        Manufacturer.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_manufacturer(form_data, manufacturer_id=pk)
+    
+    return HttpResponseRedirect('/limbs/manufacturer_list')

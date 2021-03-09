@@ -1,0 +1,33 @@
+{% if tag %}
+
+<form action="{% url 'limbs:edit_tag' tag.id %}" method="post" id="edit_tag_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <table>
+          <tr>
+              <th>
+                  Name
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="edit_tag_form" type="text" name="tag_name" value="{{tag.name}}">
+              </th>
+          </tr>
+
+  <!-- </div> -->
+
+  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
+      <input  hidden type="submit" form="edit_tag_form" name="Edit" value="Save Changes">
+      <input  hidden type="submit" form="edit_tag_form" name="Delete" value="Delete Tag">
+      <button type="button" onclick="editTag()">Edit</button>
+  <!-- </div> -->
+
+  {% else %}
+  <h1>Invalid Tag ID</h1>
+  {% endif %}
+</div>

@@ -1,0 +1,31 @@
+
+<form action="{% url 'limbs:create_supplier' %}" method="post" id="create_supplier_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <table>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Link
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <input form="create_supplier_form" type="text" name="supplier_name">
+            </th>
+            <th>
+                <input form="create_supplier_form" type="url" name="supplier_link">
+            </th>
+        </tr>
+<!-- </div> -->
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <input type="submit" form="create_supplier_form" value="Submit">
+<!-- </div> -->
+</div>

@@ -27,6 +27,13 @@
 </datalist>
 
 <div id="hidden_container"></div>
+<datalist id="tags">
+    {% for tag in tags %}
+        <option value="{{ tag.name}}">
+    {% endfor %}
+</datalist>
+
+<!-- <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;"> -->
 
 <div style = "display: block; grid-column-start: 1; grid-column: span 3;">
     <table>
@@ -87,6 +94,17 @@
     </table>
     <button type="button" onclick="addRowLocation('create_item_form')">Add</button>
 </div>
+
+<!-- <div style="grid-column: span 1; grid-column-start: 1;"> -->
+    <table id="tag_table">
+        <tr>
+            <th>
+                Tag
+            </th>
+        </tr>
+    </table>
+    <button type="button" onclick="addRowTag('create_item_form')">Add</button>
+<!-- </div> -->
 
 
 <div style="display: block; grid-column: span 1; grid-column-start: 1; justify-items: center;">
