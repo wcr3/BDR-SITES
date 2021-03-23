@@ -195,30 +195,31 @@
       <button form="edit_item_form" type="button" onclick="addRowLocation('edit_item_form')">Add</button>
   </div>
 
+  <div class = "table" style= "display: none; grid-column: span 1;">
+    <table id="tag_table">
+    <tr>
+        <th>
+            Tags
+        </th>
+    </tr>
+    {% for tag in item.tags.all %}
+    <tr>
+        <td>
+            <input list="tags" readonly id=tag_row form="edit_item_form" type="text" name="tag_name_{{forloop.counter}}" value="{{tag.name}}">
+            <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
+        </td>
+    </tr>
+    {% endfor %}
+    </table>
+    <button form="edit_item_form" type="button" onclick="addRowTag('edit_item_form')">Add</button>
+    </div>
+
 
   <div id = "table" style="grid-column: span 1; grid-column-start: 1; justify-items: center;">
       <input hidden id = "changes" type="submit" form="edit_item_form" name="Edit" value="Save Changes">
       <input hidden id = "delete" type="submit" form="edit_item_form" name="Delete" value="Delete Item">
       <button id = "edit" type="button" onclick="toggleDisplay()">Edit</button>
   </div>
-  <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
-    <table id="tag_table">
-        <tr>
-            <th>
-                Tags
-            </th>
-        </tr>
-        {% for tag in item.tags.all %}
-        <tr>
-            <td>
-                <input list="tags" readonly id=tag_row form="edit_item_form" type="text" name="tag_name_{{forloop.counter}}" value="{{tag.name}}">
-                <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <button hidden form="edit_item_form" type="button" onclick="addRowTag('edit_item_form')">Add</button>
-  <!-- </div> -->
 
 
   {% else %}
