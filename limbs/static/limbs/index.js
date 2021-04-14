@@ -195,6 +195,24 @@ window.editPressed = function editPressed(form_name){
 //       }
 // }
 
+//To do: Fix remove for everything Add ID's to corresponding input fields and grab input fields by ID.
+//For elements created by index.js (check bottom 3 functions) --> Add ID's in
+window.deleteBulkRowTable = function deleteBulkRowTable(table_name,name){
+  var table = document.getElementById(table_name);
+  var d = table.getElementsByTagName("tr");
+  var len = d.length;
+  console.log(name);
+  for(var i = 1; i < len; ++i){
+    var r = d[i].getElementsByTagName("td")[0].name;
+    if(r.includes(name)){
+      table.deleteRow(i);
+      break;
+    }
+  }
+}
+
+
+//to be replaced by DeleteRow below! 
 window.deleteRowTable = function deleteRowTable(table_name, index){
     var table = document.getElementById(table_name);
     table.deleteRow(index);
@@ -211,7 +229,7 @@ window.show_advanced_options = function show_advanced_options(){
     var advanced_search = document.getElementById("advanced_search");
     var gen_search = document.getElementById("general_search");
     var adv_search = document.getElementById("advanced_search_button")
-    
+
     gen_search.value = ""
     if (advanced_search.style.display === "none") {
         advanced_search.style.display = "block";
@@ -226,16 +244,16 @@ window.show_advanced_options = function show_advanced_options(){
 
 window.validateForm = function validateForm(validate_supplier, validate_manufacturer, validate_location){
 
- 
+
 
     if (validate_supplier) {
-        
+
         //validate suppliers
         var supplier_row_names = document.querySelectorAll('[id=supplier_row_name]');
         var supplier_names = document.getElementById("suppliers").options;
         var supplier_name_lst = []
         for (var i=0; i<supplier_names.length; i++){
-            supplier_name_lst.push(supplier_names[i].value.toLowerCase()); 
+            supplier_name_lst.push(supplier_names[i].value.toLowerCase());
         }
 
         for (var i=0; i<supplier_row_names.length; i++){
@@ -250,14 +268,14 @@ window.validateForm = function validateForm(validate_supplier, validate_manufact
     if (validate_manufacturer){
 
 
-        //validate manufacturers 
-        var manufacturer_row_names = document.querySelectorAll('[id=manufacturer_name]'); 
+        //validate manufacturers
+        var manufacturer_row_names = document.querySelectorAll('[id=manufacturer_name]');
         var manufacturer_names = document.getElementById("manufacturers").options;
         var manufacturer_name_lst = [];
         for (var i=0; i<manufacturer_names.length; i++){
-            manufacturer_name_lst.push(manufacturer_names[i].value.toLowerCase()); 
+            manufacturer_name_lst.push(manufacturer_names[i].value.toLowerCase());
         }
-        
+
         for (var i=0; i<manufacturer_row_names.length; i++){
             console.log(manufacturer_row_names[i].value.toLowerCase());
             if (!manufacturer_name_lst.includes(manufacturer_row_names[i].value.toLowerCase())){
@@ -269,14 +287,14 @@ window.validateForm = function validateForm(validate_supplier, validate_manufact
     }
 
     if (validate_location){
-    
-        //validate locations 
+
+        //validate locations
         var location_row_names = document.querySelectorAll('[id=location_row_name]');
         var location_names = document.getElementById("locations").options;
         var location_name_lst = []
         var location_name_to_id = []
         for (var i=0; i<location_names.length; i++){
-            location_name_lst.push(location_names[i].value.toLowerCase()); 
+            location_name_lst.push(location_names[i].value.toLowerCase());
             location_name_to_id.push(location_names[i].getAttribute("data-id"));
         }
 
@@ -287,13 +305,13 @@ window.validateForm = function validateForm(validate_supplier, validate_manufact
             }
         }
 
-        //override values to be ids for location  
+        //override values to be ids for location
         var container = document.getElementById("hidden_container");
         for (var i=0; i < location_row_names.length; i++){
             var index = location_name_lst.indexOf(location_row_names[i].value.toLowerCase())
             var corresponding_id = location_name_to_id[index];
-            
-            //make a hidden node 
+
+            //make a hidden node
             var hidden_input = location_row_names[i].cloneNode( true );
             hidden_input.style.display = "none";
             hidden_input.value = corresponding_id
@@ -302,10 +320,10 @@ window.validateForm = function validateForm(validate_supplier, validate_manufact
         }
 
     }
-    
+
     return true; // submit the form
-     
-     
+
+
 }
 
 window.addElem = function addElem(id_of_input, container, data_list){
@@ -315,17 +333,17 @@ window.addElem = function addElem(id_of_input, container, data_list){
     var num_children = container.children.length/2;
 
     var datalist_options = document.getElementById(data_list).options;
-    var obj_id = -1 
+    var obj_id = -1
     for (var i=0; i<datalist_options.length; i++){
         if (datalist_options[i].value.toLowerCase() === input_field.value.toLowerCase()){
             obj_id = datalist_options[i].getAttribute("data-id");
-            break; 
+            break;
         }
     }
 
     if (obj_id == -1){
         window.alert("Poor choice of " + data_list);
-        return; 
+        return;
     }
 
     var hidden_input = document.createElement("INPUT");
@@ -338,7 +356,7 @@ window.addElem = function addElem(id_of_input, container, data_list){
     btn.innerHTML = input_field.value+"-";
     btn.onclick = function() {
         hidden_input.remove();
-        btn.remove(); 
+        btn.remove();
     }
 
     input_field.value = "";
@@ -346,7 +364,6 @@ window.addElem = function addElem(id_of_input, container, data_list){
     container.appendChild(hidden_input);
 
 }
-
 
 
 window.addRowSupplier = function addRowSupplier(form_name) {
@@ -368,11 +385,11 @@ window.addRowSupplier = function addRowSupplier(form_name) {
     var cost_name = "supplier_cost_"+base_id;
 
     //button to remove
-    var remove_but = `<button type="button" onclick="deleteRowTable('supplier_table', ${base_id})"> REMOVE </button>`;
+    var remove_but = `<button type="button" onclick="deleteBulkRowTable('supplier_table', ${base_id})"> REMOVE </button>`;
 
     supplier.innerHTML = `<input required id=supplier_row_name form="${form_name}" list="suppliers" type="text" name="${supp_name}">`;
     part_no.innerHTML = `<input required id=supplier_row form="${form_name}" type="text" name="${partno_name}"> - <input required form="${form_name}" type="url" name="${link_name}">`;
-    cost.innerHTML = `<input required id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but; 
+    cost.innerHTML = `<input required id=supplier_row form="${form_name}" type="number" name="${cost_name}">` + remove_but;
 }
 
 window.addRowLocation = function addRowLocation(form_name) {
@@ -387,7 +404,7 @@ window.addRowLocation = function addRowLocation(form_name) {
   var quantity_name = "location_quantity_"+base_id;
 
   //button to remove row
-  var remove_but = `<button type="button" onclick="deleteRowTable('location_table', ${base_id})"> REMOVE </button>`;
+  var remove_but = `<button type="button" onclick="deleteBulkRowTable('location_table', ${base_id})"> REMOVE </button>`;
 
   location.innerHTML = `<input required id=location_row_name form="${form_name}" list="locations" type="text" name="${location_name}">`;
   quantity.innerHTML = `<input required id=location_row form="${form_name}" type="text" name="${quantity_name}">` + remove_but;
@@ -405,7 +422,7 @@ window.addRowTag = function addRowTag(form_name) {
 
     var tag_name = "tag_name_"+base_id;
 
-    var remove_but = `<button type="button" onclick="deleteRowTable('tag_table', ${base_id}"> REMOVE </button>`;
+    var remove_but = `<button type="button" onclick="deleteBulkRowTable('tag_table', ${base_id})"> REMOVE </button>`;
 
     tag.innerHTML = `<input id=tag_row form="${form_name}" list="tags" type="text" name="${tag_name}">` + remove_but;
 }
