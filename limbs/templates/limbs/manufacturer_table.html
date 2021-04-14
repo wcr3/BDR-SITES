@@ -4,7 +4,7 @@
         <th>Link</th>
     </tr>
     {% for manufacturer in manufacturer_list %}
-    <tr onclick="manufacturer_popup(event, '{% url 'limbs:manufacturer_popup' manufacturer.id %}')"> 
+    <tr onclick="do_popup(event, '{% url 'limbs:manufacturer_popup' manufacturer.id %}', 'manufacturer_tbl', 'manufacturer_popup')"> 
         <td>{{manufacturer.name}}</td>
         <td>{{manufacturer.link}}</td>
     </tr>

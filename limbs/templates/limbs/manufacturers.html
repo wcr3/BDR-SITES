@@ -14,7 +14,7 @@
 
 <h2>Database</h2>
 
-<button type="button" onclick="manufacturer_popup(event, '{% url 'limbs:create_manufacturer' %}')">Create Manufacturer</button>
+<button type="button" onclick="do_popup(event, '{% url 'limbs:create_manufacturer' %}', 'manufacturer_tbl', 'manufacturer_popup')">Create Manufacturer</button>
 
 <div id="manufacturer_tbl">
     {% include "./manufacturer_table.html" with manufacturer_list=manufacturer_list only %}

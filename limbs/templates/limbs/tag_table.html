@@ -3,7 +3,7 @@
         <th>Name</th>
     </tr>
     {% for tag in tag_list %}
-    <tr onclick="tag_popup(event, '{% url 'limbs:tag_popup' tag.id %}')"> 
+    <tr onclick="do_popup(event, '{% url 'limbs:tag_popup' tag.id %}', 'tag_tbl', 'tag_popup')"> 
         <td>{{tag.name}}</td>
     </tr>
     {% endfor %}

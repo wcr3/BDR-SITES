@@ -4,7 +4,7 @@
         <th>Parent</th>
     </tr>
     {% for location in location_list %}
-    <tr onclick="location_popup(event, '{% url 'limbs:location_popup' location.id %}')"> 
+    <tr onclick="do_popup(event, '{% url 'limbs:location_popup' location.id %}', 'location_tbl', 'location_popup')"> 
         <td>{{location.name}}</td>
         <td>{{location.parent}}</td>
     </tr>

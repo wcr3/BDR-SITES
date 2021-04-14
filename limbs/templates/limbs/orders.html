@@ -1,0 +1,35 @@
+
+{% extends "shared/base.html" %}
+
+{% load static %}
+
+{% block title %}LIMBS{% endblock %}
+{% block header %}
+<script type="module" src="{% static 'limbs/index.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'limbs/orders.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Orders</h1>
+
+<h2>Database</h2>
+
+<button type="button" onclick="do_popup(event, '{% url 'limbs:create_order' %}', 'order_tbl', 'order_popup')">Create Order</button>
+
+<div id="order_tbl"> 
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Created On</th>
+        </tr>
+        {% for order in order_list %}
+        <tr onclick="do_popup(event, '{% url 'limbs:order_popup' order.id %}', 'order_tbl', 'order_popup')"> 
+            <td>{{order.name}}</td>
+            <td>{{order.created_date}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+{% endblock %}

@@ -2,8 +2,9 @@
 Schema Here: https://docs.google.com/document/d/1K5ANMVTaG2ILGv1YXUcDzpnA3u7UjgyyiSCkXMwjlK8/edit
 """
 from django.db import models
-
+from datetime import date
 # Create your models here.
+
 
 class Supplier(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -66,3 +67,18 @@ class ItemQuantity(models.Model):
             # unsure this is necessary
             models.UniqueConstraint(fields=['item', 'location'], name='unique_location_quantity')
         ]
+
+class Order(models.Model):
+    name = models.CharField(max_length=255)
+    created_date = models.DateField(default=date.today)
+    completed = models.BooleanField(default=False)
+    models.ManyToManyField(Item, through='ItemOrder')
+
+    def __str__(self):
+        return self.name
+
+class ItemOrder(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)

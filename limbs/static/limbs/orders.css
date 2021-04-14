@@ -1,0 +1,36 @@
+#order_tbl {
+    position: relative;
+    /*overflow: hidden;
+    border-radius: 5px;*/
+}
+
+tr {
+    transition: background-color 0.5s, box-shadow 0.5s;
+}
+
+.loc_table {
+    background: #5a5a5a;
+}
+
+tr:not(:first-child):hover {
+    cursor: pointer;
+    background: #2F2F2F;
+}
+
+.error_popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #CF6679;
+    color: black;
+}
+
+.order_popup {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 0.5fr;
+    gap: 10px;
+    justify-items: stretch;
+    align-items: stretch;
+}

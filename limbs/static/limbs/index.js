@@ -5,7 +5,8 @@ import {expand_popup} from '/static/shared/shared.js'
  * @param {MouseEvent} e - The event that was triggered.
  * @param {string} path - The url path that is fetched to request popup data.
  */
-window.item_popup = async function item_popup(e, path) {
+
+window.do_popup = async function do_popup(e, path, table_id, table_class) {
     try {
         var response = await fetch(window.location.protocol + '//' + window.location.host + path, {
             headers: {
@@ -13,10 +14,10 @@ window.item_popup = async function item_popup(e, path) {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        var popup = await expand_popup(e.target.parentNode, document.getElementById('item_tbl'));
+        var popup = await expand_popup(e.target.parentNode, document.getElementById(table_id));
 
         if (response.ok) {
-            popup.classList.add('table_popup');
+            popup.classList.add(table_class);
         }
         else {
             popup.classList.add('error_popup');
@@ -28,6 +29,7 @@ window.item_popup = async function item_popup(e, path) {
         return;
     }
 }
+
 window.toggleDisplay = function toggleDisplay() {
   const paragraph = document.getElementsByClassName("paragraph");
   const tables = document.getElementsByClassName("table");
@@ -68,114 +70,11 @@ window.toggleDisplay = function toggleDisplay() {
   }
 }
 
-/**
- * Creates a popup for any supplier item.
- * @param {MouseEvent} e - The event that was triggered.
- * @param {*} path - The url path that is fetched to request popup data.
- */
-window.supplier_popup = async function supplier_popup(e, path) {
-    try {
-        var response = await fetch(window.location.protocol + '//' + window.location.host + path, {
-            headers: {
-                'Accept': 'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        var popup = await expand_popup(e.target.parentNode, document.getElementById('supplier_tbl'));
-
-        if (response.ok) {
-            popup.classList.add('supplier_popup');
-        }
-        else {
-            popup.classList.add('error_popup');
-        }
-        popup.innerHTML = await response.text();
-    }
-    catch (err) {
-        console.error(err);
-        return;
-    }
-}
-
-window.location_popup = async function location_popup(e, path) {
-
-    try {
-        var response = await fetch(window.location.protocol + '//' + window.location.host + path, {
-            headers: {
-                'Accept': 'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        var popup = await expand_popup(e.target.parentNode, document.getElementById('location_tbl'));
-        if (response.ok) {
-            popup.classList.add('location_popup');
-        }
-        else {
-            popup.classList.add('error_popup');
-        }
-        popup.innerHTML = await response.text();
-    }
-    catch (err) {
-        console.error(err);
-        return;
-    }
-}
-
-window.tag_popup = async function tag_popup(e, path) {
-
-    try {
-        var response = await fetch(window.location.protocol + '//' + window.location.host + path, {
-            headers: {
-                'Accept': 'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        var popup = await expand_popup(e.target.parentNode, document.getElementById('tag_tbl'));
-        if (response.ok) {
-            popup.classList.add('tag_popup');
-        }
-        else {
-            popup.classList.add('error_popup');
-        }
-        popup.innerHTML = await response.text();
-    }
-    catch (err) {
-        console.error(err);
-        return;
-    }
-}
-
-window.manufacturer_popup = async function manufacturer_popup(e, path) {
-
-    try {
-        var response = await fetch(window.location.protocol + '//' + window.location.host + path, {
-            headers: {
-                'Accept': 'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        var popup = await expand_popup(e.target.parentNode, document.getElementById('manufacturer_tbl'));
-        if (response.ok) {
-            popup.classList.add('manufacturer_popup');
-        }
-        else {
-            popup.classList.add('error_popup');
-        }
-        popup.innerHTML = await response.text();
-    }
-    catch (err) {
-        console.error(err);
-        return;
-    }
-}
-
-window.editData = function editData() {
-    var form_name = "edit_item_form";
-    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+window.editPressed = function editPressed(form_name){
     var elements = document.forms[form_name].elements;
     for (var i=0; i<elements.length; i++){
         //ignore this special input
-        if (elements[i].name === "csrfmiddlewaretoken"){
+        if (elements[i].name === "csrfmiddlewaretoken" || elements[i].id === "stayRead"){
             continue;
         }
         //remove readonly from input so user can edit
@@ -189,96 +88,123 @@ window.editData = function editData() {
       }
 }
 
-window.editSupplier = function editSupplier() {
-    var form_name = "edit_supplier_form";
-    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+// window.editData = function editData() {
+//     var form_name = "edit_item_form";
+//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+//     var elements = document.forms[form_name].elements;
+//     for (var i=0; i<elements.length; i++){
+//         //ignore this special input
+//         if (elements[i].name === "csrfmiddlewaretoken"){
+//             continue;
+//         }
+//         //remove readonly from input so user can edit
+//         if (elements[i].hasAttribute("readonly")){
+//             elements[i].removeAttribute("readonly");
+//         }
+//         //show save changes and delete buttons
+//         if (elements[i].hasAttribute("hidden")){
+//             elements[i].removeAttribute("hidden");
+//         }
+//       }
+// }
 
-    var elements = document.forms[form_name].elements;
-    for (var i=0; i<elements.length; i++){
-        //ignore this special input
-        if (elements[i].name === "csrfmiddlewaretoken"){
-            continue;
-        }
-        //remove readonly from input so user can edit
-        if (elements[i].hasAttribute("readonly")){
-            elements[i].removeAttribute("readonly");
-        }
-        //show save changes and delete buttons
-        if (elements[i].hasAttribute("hidden")){
-            elements[i].removeAttribute("hidden");
-        }
-      }
-}
+// window.editSupplier = function editSupplier() {
+//     var form_name = "edit_supplier_form";
+//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
 
-window.editLocation = function editLocation() {
-    var form_name = "edit_location_form";
-    console.log(document)
-    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+//     var elements = document.forms[form_name].elements;
+//     for (var i=0; i<elements.length; i++){
+//         //ignore this special input
+//         if (elements[i].name === "csrfmiddlewaretoken"){
+//             continue;
+//         }
+//         //remove readonly from input so user can edit
+//         if (elements[i].hasAttribute("readonly")){
+//             elements[i].removeAttribute("readonly");
+//         }
+//         //show save changes and delete buttons
+//         if (elements[i].hasAttribute("hidden")){
+//             elements[i].removeAttribute("hidden");
+//         }
+//       }
+// }
 
-    var elements = document.forms[form_name].elements;
-    for (var i=0; i<elements.length; i++){
-        //ignore this special input
-        if (elements[i].name === "csrfmiddlewaretoken"){
-            continue;
-        }
-        //remove readonly from input so user can edit
-        if (elements[i].hasAttribute("readonly")){
-            elements[i].removeAttribute("readonly");
-        }
-        //show save changes and delete buttons
-        if (elements[i].hasAttribute("hidden")){
-            elements[i].removeAttribute("hidden");
-        }
-      }
-}
+// window.editLocation = function editLocation() {
+//     var form_name = "edit_location_form";
+//     console.log(document)
+//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
 
-window.editTag = function editTag() {
-    var form_name = "edit_tag_form";
-    console.log(document)
-    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+//     var elements = document.forms[form_name].elements;
+//     for (var i=0; i<elements.length; i++){
+//         //ignore this special input
+//         if (elements[i].name === "csrfmiddlewaretoken"){
+//             continue;
+//         }
+//         //remove readonly from input so user can edit
+//         if (elements[i].hasAttribute("readonly")){
+//             elements[i].removeAttribute("readonly");
+//         }
+//         //show save changes and delete buttons
+//         if (elements[i].hasAttribute("hidden")){
+//             elements[i].removeAttribute("hidden");
+//         }
+//       }
+// }
 
-    var elements = document.forms[form_name].elements;
-    for (var i=0; i<elements.length; i++){
-        //ignore this special input
-        if (elements[i].name === "csrfmiddlewaretoken"){
-            continue;
-        }
-        //remove readonly from input so user can edit
-        if (elements[i].hasAttribute("readonly")){
-            elements[i].removeAttribute("readonly");
-        }
-        //show save changes and delete buttons
-        if (elements[i].hasAttribute("hidden")){
-            elements[i].removeAttribute("hidden");
-        }
-      }
-}
+// window.editTag = function editTag() {
+//     var form_name = "edit_tag_form";
+//     console.log(document)
+//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
 
-window.editManufacturer = function editManufacturer() {
-    var form_name = "edit_manufacturer_form";
-    console.log(document)
-    var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+//     var elements = document.forms[form_name].elements;
+//     for (var i=0; i<elements.length; i++){
+//         //ignore this special input
+//         if (elements[i].name === "csrfmiddlewaretoken"){
+//             continue;
+//         }
+//         //remove readonly from input so user can edit
+//         if (elements[i].hasAttribute("readonly")){
+//             elements[i].removeAttribute("readonly");
+//         }
+//         //show save changes and delete buttons
+//         if (elements[i].hasAttribute("hidden")){
+//             elements[i].removeAttribute("hidden");
+//         }
+//       }
+// }
 
-    var elements = document.forms[form_name].elements;
-    for (var i=0; i<elements.length; i++){
-        //ignore this special input
-        if (elements[i].name === "csrfmiddlewaretoken"){
-            continue;
-        }
-        //remove readonly from input so user can edit
-        if (elements[i].hasAttribute("readonly")){
-            elements[i].removeAttribute("readonly");
-        }
-        //show save changes and delete buttons
-        if (elements[i].hasAttribute("hidden")){
-            elements[i].removeAttribute("hidden");
-        }
-      }
-}
+// window.editManufacturer = function editManufacturer() {
+//     var form_name = "edit_manufacturer_form";
+//     console.log(document)
+//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
+
+//     var elements = document.forms[form_name].elements;
+//     for (var i=0; i<elements.length; i++){
+//         //ignore this special input
+//         if (elements[i].name === "csrfmiddlewaretoken"){
+//             continue;
+//         }
+//         //remove readonly from input so user can edit
+//         if (elements[i].hasAttribute("readonly")){
+//             elements[i].removeAttribute("readonly");
+//         }
+//         //show save changes and delete buttons
+//         if (elements[i].hasAttribute("hidden")){
+//             elements[i].removeAttribute("hidden");
+//         }
+//       }
+// }
 
 window.deleteRowTable = function deleteRowTable(table_name, index){
     var table = document.getElementById(table_name);
     table.deleteRow(index);
+}
+
+//function should not have same errors as the above one 
+window.deleteRow = function deleteRow(rowid)  
+{   
+    var row = document.getElementById(rowid);
+    row.parentNode.removeChild(row);
 }
 
 window.show_advanced_options = function show_advanced_options(){
@@ -422,11 +348,6 @@ window.addElem = function addElem(id_of_input, container, data_list){
 }
 
 
-window.removeElem = function removeElem(){
-
-
-
-}
 
 window.addRowSupplier = function addRowSupplier(form_name) {
     var table = document.getElementById("supplier_table");

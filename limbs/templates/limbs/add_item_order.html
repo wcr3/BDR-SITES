@@ -1,0 +1,53 @@
+{% if item %}
+
+<form action="{% url 'limbs:add_item_order' item.id %}" method="post" id="add_item_order_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+        <table>
+          <tr>
+              <th>
+                Item Name
+              </th>
+              <th>
+                Supplier
+              </th>
+              <th>
+                Quantity 
+              </th>
+              <th>
+                Order
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="add_item_order_form" type="text" name="item_name" value="{{item.name}}">
+              </th>
+              <th>
+                <select form="add_item_order_form"  name="item_order_supplier">
+                    {% for supp in supp_list %}
+                        <option value="{{supp.id}}"> {{supp.supplier}} </option>
+                    {% endfor %}
+                </select>
+              </th>
+              <th>
+                <input form="add_item_order_form" type="number" name="item_order_qty">
+              </th>
+              <th>
+                <select form="add_item_order_form"  name="order_id">
+                    {% for order in order_list %}
+                        <option value="{{order.id}}"> {{order.name}} </option>
+                    {% endfor %}
+                </select>
+              </th>
+          </tr>
+        </table>
+
+      <input type="submit" form="add_item_order_form" name="Add" value="Add">
+
+  {% else %}
+  <h1>Invalid Item ID</h1>
+  {% endif %}
+</div>

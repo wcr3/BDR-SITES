@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import random
-from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location, Tag
+from .models import Item, Manufacturer, ItemSupplier, Supplier, ItemQuantity, Location, Tag, Order, ItemOrder
 from django.db.models import Q, CharField
 import openpyxl
 
@@ -71,9 +71,6 @@ def upload_excel(request):
         "suppliers":suppliers,
         "locations":locations,
         "tags":tags})
-
-
-
 
 def item_search(request):
     item_list = Item.objects.all()
@@ -585,3 +582,75 @@ def edit_manufacturer(request, pk):
             parse_form_create_manufacturer(form_data, manufacturer_id=pk)
     
     return HttpResponseRedirect('/limbs/manufacturer_list')
+
+def orders_page(request):
+    order_list = Order.objects.all()
+    return render(request, 'limbs/orders.html', {'order_list': order_list})
+
+def parse_form_create_order(form_data, order_id=None):
+
+    temp_order = Order(
+        name=form_data["order_name"],
+    )
+
+    if item_orders_exist: 
+        pass 
+
+    if order_id:
+        temp_order.id = order_id
+
+    #save the item
+    temp_order.save()
+
+def create_order(request):
+    if request.method == 'POST':
+        form_data = request.POST
+        parse_form_create_order(form_data)
+        #redirect to home page
+        return HttpResponseRedirect('/limbs/orders')
+    else:
+        return render(request, 
+        'limbs/create_order.html')
+
+def order_popup(request, pk):
+    order = Order.objects.get(id=pk)
+    item_orders = ItemOrder.objects.all().filter(order=order)
+
+    return render(request, 
+    'limbs/order_popup.html', {
+        'order': order,
+        'item_orders': item_orders, 
+    })
+
+def edit_order(request, pk):
+    if request.method == 'POST':
+        form_data = request.POST
+        #delete original item
+        Order.objects.filter(id=pk).delete()
+
+        #make new item with same id 
+        if "Edit" in form_data.keys():
+            parse_form_create_order(form_data, order_id=pk)
+    
+    return HttpResponseRedirect('/limbs/orders')
+
+def add_item_order(request, pk):
+    if request.method == 'POST':
+        form_data = request.POST
+        item = Item.objects.get(id=pk)
+        order = Order.objects.get(id=form_data['order_id'])
+        supplier = Supplier.objects.get(id=form_data["item_order_supplier"])
+        order_qty = form_data["item_order_qty"]
+        new_item_order = ItemOrder(item=item, order=order, quantity=order_qty, supplier=supplier)
+        new_item_order.save()
+        return HttpResponseRedirect('/limbs')
+    else:
+        item = Item.objects.get(id=pk)
+        supp_list = ItemSupplier.objects.all().filter(item=item)
+        order_list = Order.objects.all().filter(completed=False)
+        return render(request, 
+        'limbs/add_item_order.html', {
+            'item': item,
+            'supp_list': supp_list,
+            'order_list':order_list,  
+        })

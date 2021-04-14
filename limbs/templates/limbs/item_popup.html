@@ -19,11 +19,6 @@
 <datalist id="locations">
     {% for location in locations %}
         <option data-id="{{location.id}}" value="{{location}}">
-        <!-- {% if location.parent %}
-        <option data-id="{{location.id}}" value="{{location.name}}.{{location.parent}}">
-        {% else %}
-        <option data-id="{{location.id}}" value="{{location.name}}">
-        {% endif %} -->
     {% endfor %}
 </datalist>
 

@@ -1,0 +1,61 @@
+{% if order %}
+
+<form action="{% url 'limbs:edit_order' order.id %}" method="post" id="edit_order_form">
+    {% csrf_token %}
+</form>
+
+<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+
+        <table>
+          <tr>
+              <th>
+                  Name
+              </th>
+          </tr>
+          <tr>
+              <th>
+                  <input readonly form="edit_order_form" type="text" name="order_name" value="{{order.name}}">
+              </th>
+          </tr>
+        </table>
+
+        <table>
+            <tr>
+                <th>
+                  Item Name
+                </th>
+                <th>
+                  Supplier
+                </th>
+                <th>
+                  Quantity 
+                </th>
+            </tr>
+
+            {% for item_order in item_orders %}
+            <tr id="item_order_{{forloop.counter}}" >
+                <th>
+                    <input id="stayRead" hidden form="edit_order_form" type="text" name="item_id_{{forloop.counter}}" value="{{item_order.item.id}}">
+                    <input id="stayRead" readonly type="text" value="{{item_order.item}}">
+                </th>
+                <th>
+                    <input id="stayRead" hidden form="edit_order_form" type="text" name="supplier_id_{{forloop.counter}}" value="{{item_order.supplier.id}}">
+                    <input id="stayRead" readonly type="text" value="{{item_order.supplier}}">
+                </th>
+                <th>
+                    <input readonly form="edit_order_form" type="number" name="item_order_qty_{{forloop.counter}}" value="{{item_order.quantity}}">
+                    <button hidden form="edit_order_form" type="button" onclick="deleteRow('item_order_{{forloop.counter}}')"> REMOVE </button>
+                </th>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+      <input  hidden type="submit" form="edit_order_form" name="Edit" value="Save Changes">
+      <input  hidden type="submit" form="edit_order_form" name="Delete" value="Delete Order">
+      <button type="button" onclick="editPressed('edit_order_form')">Edit</button>
+
+  {% else %}
+  <h1>Invalid Order ID</h1>
+  {% endif %}
+</div>
