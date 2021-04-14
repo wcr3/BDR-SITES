@@ -8,9 +8,12 @@ from django.db import models
 class Supplier(models.Model):
     name = models.CharField(max_length=255, unique=True)
     link = models.URLField(max_length=255, blank=True)
+    #shipping cost
 
     def __str__(self):
         return self.name
+
+#Class Order. Date created/Item(foreignKey)/Completed
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -31,9 +34,9 @@ class Location(models.Model):
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        if self.parent: 
+        if self.parent:
             return self.name + "." + str(self.parent)
-        return self.name 
+        return self.name
 
 class Item(models.Model):
     name = models.CharField(max_length=255)

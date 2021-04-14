@@ -1,6 +1,6 @@
 {% if item %}
 
-<form onsubmit="return validateForm(true, true, true)" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
+<form style = "display:none;" onsubmit="return validateForm(true, true, true)" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
     {% csrf_token %}
 </form>
 
@@ -26,8 +26,14 @@
         {% endif %} -->
     {% endfor %}
 </datalist>
+<datalist id="tags">
+    {% for tag in tags %}
+        <option value="{{ tag.name}}">
+    {% endfor %}
+</datalist>
 
-<div id="hidden_container"></div>
+
+<div id="hidden_container" style = "display:none;"></div>
 <div class = 'popup_contents table_popup'>
      <div class = "paragraph" style = "grid-column: span 3; justify-self: start;">
     <h3>
@@ -102,12 +108,24 @@
         {% endfor %}
     </table>
   </div>
-<datalist id="tags">
-    {% for tag in tags %}
-        <option value="{{ tag.name}}">
-    {% endfor %}
-</datalist>
-
+  <div class = "paragraph" style = "grid-column: span 1;">
+  <table>
+      <tr>
+          <th>
+              Tags
+          </th>
+      </tr>
+      {% for tag_info in item.tags.all %}
+      <tr>
+          <td>
+            <p>
+              {{tag_info.name}}
+            </p>
+          </td>
+      </tr>
+      {% endfor %}
+  </table>
+</div>
 <!-- <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
 
 </div> -->
@@ -162,7 +180,7 @@
               </td>
               <td>
                   <input required  id=supplier_row form="edit_item_form" type="number" name="supplier_cost_{{forloop.counter}}" value="{{supplier_info.cost}}">
-                  <button form="edit_item_form" type="button" onclick="deleteRowTable('supplier_table', {{forloop.counter}})"> REMOVE </button>
+                  <button form="edit_item_form" type="button" onclick="deleteBulkRowTable('supplier_table', '{{supplier_info.supplier}}')"> REMOVE </button>
                 </td>
           </tr>
           {% endfor %}
@@ -187,7 +205,7 @@
               </td>
               <td>
                   <input required  id=quantity_row form="edit_item_form" type="number" name="location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
-                  <button form="edit_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
+                  <button form="edit_item_form" type="button" onclick="deleteRowTable('location_table', '{{quantity_info.location}}')"> REMOVE </button>
               </td>
           </tr>
           {% endfor %}
@@ -206,7 +224,7 @@
     <tr>
         <td>
             <input list="tags" readonly id=tag_row form="edit_item_form" type="text" name="tag_name_{{forloop.counter}}" value="{{tag.name}}">
-            <button hidden form="edit_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
+            <button hidden form="edit_item_form" type="button" onclick="deleteBulkRowTable('tag_table', '{{tag_info.name}}')"> REMOVE </button>
         </td>
     </tr>
     {% endfor %}

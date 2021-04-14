@@ -82,7 +82,7 @@
 
 
     <div class = "table" style= "grid-column: span 1;">
-    <table id="location_table">
+    <table id="location_table_{{forloop.counter}}">
         <tr>
             <th>
                 Location
@@ -98,7 +98,8 @@
             </td>
             <td>
                 <input required  id=quantity_row form="create_bulk_item_form" type="number" name="{{forloop.parentloop.counter}}_location_quantity_{{forloop.counter}}" value="{{quantity_info.quantity}}">
-                <button form="create_bulk_item_form" type="button" onclick="deleteRowTable('location_table', {{forloop.counter}})"> REMOVE </button>
+                <button form="create_bulk_item_form" type="button" onclick="deleteBulkRowTable('location_table_{{forloop.parentloop.counter}}', '{{quantity_info.location}}')"> REMOVE </button>
+
             </td>
             {% endfor %}
         </tr>
@@ -106,7 +107,7 @@
     </div>
 
     <div class = "table" style="grid-column: span 1;">
-      <table id = "tag_table">
+      <table id = "tag_table_{{forloop.counter}}">
         <tr>
           <th>
             Tags
@@ -116,7 +117,7 @@
         <tr>
           <td>
             <input required list = "tags"  id=tag_row form="create_bulk_item_form" type="text" name="{{forloop.parentloop.counter}}_tag_{{forloop.counter}}" value="{{tag_info}}">
-            <button form="create_bulk_item_form" type="button" onclick="deleteRowTable('tag_table', {{forloop.counter}})"> REMOVE </button>
+            <button form="create_bulk_item_form" type="button" onclick="deleteBulkRowTable('tag_table_{{forloop.parentloop.counter}}', '{{tag_info.name}}')"> REMOVE </button>
           </td>
         </tr>
         {% endfor %}
