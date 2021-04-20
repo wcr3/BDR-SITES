@@ -4,7 +4,7 @@
     {% csrf_token %}
 </form>
 
-<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+<div style="grid-column: span 1;  grid-row-start: 2; justify-items: center;">
 
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
       <table>
@@ -24,6 +24,7 @@
                   <input readonly form="edit_manufacturer_form" type="url" name="manufacturer_link" value="{{manufacturer.link}}">
               </th>
           </tr>
+        </table>
 
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
       <input  hidden type="submit" form="edit_manufacturer_form" name="Edit" value="Save Changes">

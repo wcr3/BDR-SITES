@@ -10,7 +10,7 @@
     {% endfor %}
 </datalist>
 
-<div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;">
+<div style="grid-column: span 1; grid-row-start: 2; justify-items: center;">
 
       <table>
           <tr>
@@ -29,12 +29,13 @@
                   <input readonly list="locations" form="edit_location_form" type="text" name="location_parent" value="{{location.parent}}">
               </th>
           </tr>
-
   <!-- <div style="grid-column: span 1; grid-column-start: 2; justify-items: center;"> -->
-      <input hidden type="submit" form="edit_location_form" name="Edit" value="Save Changes">
-      <input hidden type="submit" form="edit_location_form" name="Delete" value="Delete Location">
-      <button type="button" onclick="editPressed('edit_location_form')">Edit</button>
   <!-- </div> -->
+</table>
+  <input hidden type="submit" form="edit_location_form" name="Edit" value="Save Changes">
+  <input hidden type="submit" form="edit_location_form" name="Delete" value="Delete Location">
+  <button type="button" onclick="editPressed('edit_location_form')">Edit</button>
+
 
   {% else %}
   <h1>Invalid Location ID</h1>
