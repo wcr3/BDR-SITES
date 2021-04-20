@@ -28,7 +28,7 @@
               <th>
                 <select form="add_item_order_form"  name="item_order_supplier">
                     {% for supp in supp_list %}
-                        <option value="{{supp.id}}"> {{supp.supplier}} </option>
+                        <option value="{{supp.supplier.id}}"> {{supp.supplier}} </option>
                     {% endfor %}
                 </select>
               </th>

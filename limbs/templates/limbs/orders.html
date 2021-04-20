@@ -21,12 +21,27 @@
         <tr>
             <th>Name</th>
             <th>Created On</th>
+            <th> Actions </th>
         </tr>
         {% for order in order_list %}
         <tr onclick="do_popup(event, '{% url 'limbs:order_popup' order.id %}', 'order_tbl', 'order_popup')">
             <td>{{order.name}}</td>
             <td>{{order.created_date}}</td>
+            <td> 
+
+                <form action="{% url 'limbs:interact_order' order.id %}" method="post">
+                    {% csrf_token %}
+                    {% if order.completed %}
+                    <h3> Completed</h3> 
+                    {% else %}
+                    <input  type="submit" name="Complete" value="Mark as Complete"> 
+                    <input  type="submit" name="Generate" value="Generate Excel ">
+                    {% endif %}
+                </form>
+            </td>
+            
         </tr>
+
         {% endfor %}
     </table>
 </div>

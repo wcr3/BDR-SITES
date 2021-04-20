@@ -38,5 +38,6 @@ urlpatterns = [
     path('create_order', views.create_order, name='create_order'),
     path('order_popup/<int:pk>', views.order_popup, name='order_popup'),
     path('edit_order/<int:pk>', views.edit_order, name='edit_order'),
+    path('interact_order/<int:pk>', views.interact_order, name='interact_order'),
     path('add_item_order/<int:pk>', views.add_item_order, name='add_item_order'),
 ]

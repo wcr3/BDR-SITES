@@ -88,113 +88,6 @@ window.editPressed = function editPressed(form_name){
       }
 }
 
-// window.editData = function editData() {
-//     var form_name = "edit_item_form";
-//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-//     var elements = document.forms[form_name].elements;
-//     for (var i=0; i<elements.length; i++){
-//         //ignore this special input
-//         if (elements[i].name === "csrfmiddlewaretoken"){
-//             continue;
-//         }
-//         //remove readonly from input so user can edit
-//         if (elements[i].hasAttribute("readonly")){
-//             elements[i].removeAttribute("readonly");
-//         }
-//         //show save changes and delete buttons
-//         if (elements[i].hasAttribute("hidden")){
-//             elements[i].removeAttribute("hidden");
-//         }
-//       }
-// }
-
-// window.editSupplier = function editSupplier() {
-//     var form_name = "edit_supplier_form";
-//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-
-//     var elements = document.forms[form_name].elements;
-//     for (var i=0; i<elements.length; i++){
-//         //ignore this special input
-//         if (elements[i].name === "csrfmiddlewaretoken"){
-//             continue;
-//         }
-//         //remove readonly from input so user can edit
-//         if (elements[i].hasAttribute("readonly")){
-//             elements[i].removeAttribute("readonly");
-//         }
-//         //show save changes and delete buttons
-//         if (elements[i].hasAttribute("hidden")){
-//             elements[i].removeAttribute("hidden");
-//         }
-//       }
-// }
-
-// window.editLocation = function editLocation() {
-//     var form_name = "edit_location_form";
-//     console.log(document)
-//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-
-//     var elements = document.forms[form_name].elements;
-//     for (var i=0; i<elements.length; i++){
-//         //ignore this special input
-//         if (elements[i].name === "csrfmiddlewaretoken"){
-//             continue;
-//         }
-//         //remove readonly from input so user can edit
-//         if (elements[i].hasAttribute("readonly")){
-//             elements[i].removeAttribute("readonly");
-//         }
-//         //show save changes and delete buttons
-//         if (elements[i].hasAttribute("hidden")){
-//             elements[i].removeAttribute("hidden");
-//         }
-//       }
-// }
-
-// window.editTag = function editTag() {
-//     var form_name = "edit_tag_form";
-//     console.log(document)
-//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-
-//     var elements = document.forms[form_name].elements;
-//     for (var i=0; i<elements.length; i++){
-//         //ignore this special input
-//         if (elements[i].name === "csrfmiddlewaretoken"){
-//             continue;
-//         }
-//         //remove readonly from input so user can edit
-//         if (elements[i].hasAttribute("readonly")){
-//             elements[i].removeAttribute("readonly");
-//         }
-//         //show save changes and delete buttons
-//         if (elements[i].hasAttribute("hidden")){
-//             elements[i].removeAttribute("hidden");
-//         }
-//       }
-// }
-
-// window.editManufacturer = function editManufacturer() {
-//     var form_name = "edit_manufacturer_form";
-//     console.log(document)
-//     var inputs_of_form = document.forms[form_name].getElementsByTagName("input");
-
-//     var elements = document.forms[form_name].elements;
-//     for (var i=0; i<elements.length; i++){
-//         //ignore this special input
-//         if (elements[i].name === "csrfmiddlewaretoken"){
-//             continue;
-//         }
-//         //remove readonly from input so user can edit
-//         if (elements[i].hasAttribute("readonly")){
-//             elements[i].removeAttribute("readonly");
-//         }
-//         //show save changes and delete buttons
-//         if (elements[i].hasAttribute("hidden")){
-//             elements[i].removeAttribute("hidden");
-//         }
-//       }
-// }
-
 //To do: Fix remove for everything Add ID's to corresponding input fields and grab input fields by ID.
 //For elements created by index.js (check bottom 3 functions) --> Add ID's in
 window.deleteBulkRowTable = function deleteBulkRowTable(table_name,name){
@@ -242,7 +135,7 @@ window.show_advanced_options = function show_advanced_options(){
       }
 }
 
-window.validateForm = function validateForm(validate_supplier, validate_manufacturer, validate_location){
+window.validateForm = function validateForm(validate_supplier, validate_manufacturer, validate_location, validate_tag){
 
 
 
@@ -317,6 +210,25 @@ window.validateForm = function validateForm(validate_supplier, validate_manufact
             hidden_input.value = corresponding_id
             hidden_input.name = "id_" + hidden_input.name
             container.appendChild(hidden_input);
+        }
+
+    }
+
+    if (validate_tag){
+
+        //validate tags
+        var tag_row_names = document.querySelectorAll('[id=tag_row]');
+        var tag_names = document.getElementById("tags").options;
+        var tag_name_lst = []
+        for (var i=0; i<tag_names.length; i++){
+            tag_name_lst.push(tag_names[i].value.toLowerCase());
+        }
+
+        for (var i=0; i<tag_row_names.length; i++){
+            if (!tag_name_lst.includes(tag_row_names[i].value.toLowerCase())){
+                window.alert(tag_row_names[i].value+" is not a valid tag");
+                return false;
+            }
         }
 
     }

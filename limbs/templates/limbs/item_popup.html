@@ -1,6 +1,6 @@
 {% if item %}
 
-<form style = "display:none;" onsubmit="return validateForm(true, true, true)" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
+<form style = "display:none;" onsubmit="return validateForm(true, true, true, true)" action="{% url 'limbs:edit_item' item.id %}" method="post" id="edit_item_form">
     {% csrf_token %}
 </form>
 
@@ -21,6 +21,7 @@
         <option data-id="{{location.id}}" value="{{location}}">
     {% endfor %}
 </datalist>
+
 <datalist id="tags">
     {% for tag in tags %}
         <option value="{{ tag.name}}">
