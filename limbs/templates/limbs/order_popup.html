@@ -8,13 +8,19 @@
 
         <table>
           <tr>
-              <th>
-                  Name
-              </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Cost 
+                </th>
           </tr>
           <tr>
               <th>
                   <input readonly form="edit_order_form" type="text" name="order_name" value="{{order.name}}">
+              </th>
+              <th>
+                {{ estimated_cost }}
               </th>
           </tr>
         </table>
@@ -50,10 +56,15 @@
             {% endfor %}
         </table>
 
+    {% if order.completed %}
+        <input  type="submit" form="edit_order_form" name="Delete" value="Delete Order">
+    {% else %}
 
-      <input  hidden type="submit" form="edit_order_form" name="Edit" value="Save Changes">
-      <input  hidden type="submit" form="edit_order_form" name="Delete" value="Delete Order">
-      <button type="button" onclick="editPressed('edit_order_form')">Edit</button>
+        <input  hidden type="submit" form="edit_order_form" name="Edit" value="Save Changes">
+        <input  hidden type="submit" form="edit_order_form" name="Delete" value="Delete Order">
+        <button type="button" onclick="editPressed('edit_order_form')">Edit</button>
+        
+    {% endif %}
 
   {% else %}
   <h1>Invalid Order ID</h1>

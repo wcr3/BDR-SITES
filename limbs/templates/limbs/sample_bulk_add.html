@@ -12,7 +12,7 @@
 {% block content %}
 <h1>LIMBS</h1>
 
-<form onsubmit="return validateForm(false, true, true)" action="{% url 'limbs:create_bulk_items' %}" method="post" id="create_bulk_item_form">
+<form onsubmit="return validateForm(false, true, true, true)" action="{% url 'limbs:create_bulk_items' %}" method="post" id="create_bulk_item_form">
     {% csrf_token %}
 </form>
 

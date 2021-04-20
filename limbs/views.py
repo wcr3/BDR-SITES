@@ -84,7 +84,6 @@ def item_search(request):
             #regular search
             results_searched = True
             search_fields = form_data["general_search"].split(" ")
-            print(search_fields)
             qs = Q()
             for search_field in search_fields:
 
@@ -112,7 +111,7 @@ def item_search(request):
                 for query in big_q:
                     qs = qs | query
 
-            item_list = Item.objects.filter(qs)
+            item_list = Item.objects.filter(qs).distinct()
 
 
         else:
@@ -173,6 +172,23 @@ def item_search(request):
         "tags":tags,
         })
 
+
+def get_form_max_ids(lst_of_prefix, form_data):
+    final_list = []
+    index = 0 
+    for prefix_str in lst_of_prefix:
+        final_list.append(-1)
+        for key in form_data.keys():
+            if prefix_str in key:
+                arr = key.split(prefix_str)
+                final_list[index] = max(final_list[index], int(arr[-1]))
+        index += 1
+
+    if len(final_list) == 1:
+        return final_list[0]
+
+    return tuple(final_list)
+
 def parse_form_create_item(form_data, item_id=None, from_bulk=False):
         name = form_data["item_name"]
         manufacturer_obj = Manufacturer.objects.get(name__iexact=form_data["manufacturer_name"])
@@ -204,16 +220,20 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
 
 
         #for supplier and location table determine max id...
-        supplier_max_id = -1
-        location_max_id = -1
-        tag_max_id = -1 
-        for key in form_data.keys():
-            if "supplier_name_" in key:
-                supplier_max_id = max(supplier_max_id, int(key[-1]))
-            if "location_name_" in key:
-                location_max_id = max(location_max_id, int(key[-1]))
-            if "tag_name_" in key:
-                tag_max_id = max(tag_max_id, int(key[-1]))
+
+        # supplier_max_id = -1
+        # location_max_id = -1
+        # tag_max_id = -1 
+        # for key in form_data.keys():
+        #     if "supplier_name_" in key:
+        #         supplier_max_id = max(supplier_max_id, int(key[-1]))
+        #     if "location_name_" in key:
+        #         location_max_id = max(location_max_id, int(key[-1]))
+        #     if "tag_name_" in key:
+        #         tag_max_id = max(tag_max_id, int(key[-1]))
+                
+
+        supplier_max_id, location_max_id, tag_max_id = get_form_max_ids(["supplier_name_", "location_name_", "tag_name_"], form_data)
 
         #populating the through fields for suppliers
         for i in range(1, supplier_max_id+1):
@@ -232,7 +252,6 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
                 link = form_data[key_c],
                 cost = "{:.2f}".format(float(form_data[key_d])),
             )
-            print(item_sup)
             item_sup.save()
 
         #populating the through fields for locations
@@ -256,7 +275,7 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
                 location = Location.objects.get(id=form_data[key_g]),
                 quantity = form_data[key_f],
             )
-            print(item_quant)
+
             item_quant.save()
 
         for i in range(1, tag_max_id+1):
@@ -270,13 +289,10 @@ def parse_form_create_item(form_data, item_id=None, from_bulk=False):
 
 def item_table(request, search):
     item_list = Item.objects
-    print("Hello")
-    print(item_list)
     return render(request, 'limbs/item_table.html', {'item_list': item_list})
 
 def item_popup(request, pk):
     item = Item.objects.get(id=pk)
-    print(item)
     manufacturers = Manufacturer.objects.all
     suppliers = Supplier.objects.all 
     locations = Location.objects.all
@@ -308,9 +324,6 @@ def create_item(request):
     if request.method == 'POST':
 
         form_data = request.POST
-
-        print(form_data)
-
         #make new item
         parse_form_create_item(form_data)
 
@@ -329,13 +342,26 @@ def create_item(request):
         "tags":tags})
 
 def create_bulk_items(request):
+    """
+    TODO: NEED TO FIX THIS IF WE REMOVE A ROW...form data might not exist! 
+    also int(key[-1]) onlt works if one digit, will fix 
+
+    should work but we should skip in both loops if key doesn't exist since you remove! 
+
+    NEED TO TEST THAT MY CHANGES WORK! 
+    """
     if request.method == 'POST':
         #change this data
         form_data = request.POST
         location_max_id = -1
-        for key in form_data.keys():
-            if "location_name_" in key:
-                location_max_id = max(location_max_id, int(key[-1]))
+        
+        # for key in form_data.keys():
+        #     if "location_name_" in key:
+        #         location_max_id = max(location_max_id, int(key[-1]))
+
+        location_max_id = get_form_max_ids(["location_name_"], form_data)
+
+
         item_list = form_data.getlist('_item_name')
         part_list = form_data.getlist('_part_number')
         man_list = form_data.getlist('_manufacturer_name')
@@ -347,6 +373,10 @@ def create_bulk_items(request):
             }
             for y in range(location_max_id):
                 loc = str(x+1) + '_location_name_' + str(y+1)
+
+                if loc not in form_data:
+                    continue 
+
                 quant = str(x+1) + '_location_quantity_'+ str(y+1)
                 id = 'id_'+str(x+1) + '_location_name_'+str(y+1)
                 sample_data['id_location_name_' + str(y+1)] = form_data[id]
@@ -364,7 +394,6 @@ def supplier_table(request):
 def supplier_popup(request, pk):
 
     supplier = Supplier.objects.get(id=pk)
-    print(supplier)
     return render(request, 
     'limbs/supplier_popup.html', {"supplier": supplier})
 
@@ -388,9 +417,6 @@ def create_supplier(request):
     if request.method == 'POST':
 
         form_data = request.POST
-
-        print(form_data)
-
         #make new supplier
         parse_form_create_supplier(form_data)
 
@@ -421,7 +447,7 @@ def location_popup(request, pk):
 
     location = Location.objects.get(id=pk)
     locations = Location.objects.all
-    print(locations)
+
     return render(request, 
     'limbs/location_popup.html', {
         'location': location, "locations": locations
@@ -432,9 +458,6 @@ def create_location(request):
     if request.method == 'POST':
 
         form_data = request.POST
-
-        print(form_data)
-
         #make new supplier
         parse_form_create_location(form_data)
 
@@ -491,9 +514,6 @@ def create_tag(request):
     if request.method == 'POST':
 
         form_data = request.POST
-
-        print(form_data)
-
         #make new supplier
         parse_form_create_tag(form_data)
 
@@ -544,8 +564,6 @@ def create_manufacturer(request):
 
         form_data = request.POST
 
-        print(form_data)
-
         #make new supplier
         parse_form_create_manufacturer(form_data)
 
@@ -587,20 +605,36 @@ def orders_page(request):
     order_list = Order.objects.all()
     return render(request, 'limbs/orders.html', {'order_list': order_list})
 
-def parse_form_create_order(form_data, order_id=None):
+def parse_form_create_order(form_data, order_id=None, created_at=None):
 
+    print(form_data)
     temp_order = Order(
         name=form_data["order_name"],
     )
+    #determine max ids 
+    max_id = get_form_max_ids(["item_id_"], form_data)
 
-    if item_orders_exist: 
-        pass 
-
-    if order_id:
+    if order_id and created_at:
         temp_order.id = order_id
+        temp_order.created_date = created_at
 
     #save the item
     temp_order.save()
+
+    for id_val in range(1, max_id+1):
+        key_item = "item_id_" + str(id_val)
+        key_supp = "supplier_id_" + str(id_val)
+        key_qty = "item_order_qty_" + str(id_val)
+
+        if key_item not in form_data:
+            continue 
+
+        item_obj =  Item.objects.get(id=form_data[key_item])  
+        supplier_obj = Supplier.objects.get(id= form_data[key_supp]) 
+        qty = form_data[key_qty]
+
+        temp_item_order = ItemOrder(item=item_obj, order=temp_order, quantity=qty, supplier=supplier_obj)
+        temp_item_order.save() 
 
 def create_order(request):
     if request.method == 'POST':
@@ -612,25 +646,40 @@ def create_order(request):
         return render(request, 
         'limbs/create_order.html')
 
+def get_estimated_cost_order(pk):
+    order = Order.objects.get(id=pk)
+    item_orders = ItemOrder.objects.all().filter(order=order)
+    total_cost = 0
+    for io in item_orders:
+        cost_info = ItemSupplier.objects.get(item=io.item, supplier=io.supplier)
+        sub_total = cost_info.cost * io.quantity 
+        total_cost += sub_total
+    return total_cost
+
 def order_popup(request, pk):
     order = Order.objects.get(id=pk)
     item_orders = ItemOrder.objects.all().filter(order=order)
+    estimated_cost = get_estimated_cost_order(pk)
 
     return render(request, 
     'limbs/order_popup.html', {
         'order': order,
         'item_orders': item_orders, 
+        'estimated_cost': estimated_cost, 
     })
 
 def edit_order(request, pk):
     if request.method == 'POST':
         form_data = request.POST
+
         #delete original item
+        original_order = Order.objects.get(id=pk)
+        created_date = original_order.created_date
         Order.objects.filter(id=pk).delete()
 
-        #make new item with same id 
+        #make new item with same id and date 
         if "Edit" in form_data.keys():
-            parse_form_create_order(form_data, order_id=pk)
+            parse_form_create_order(form_data, order_id=pk, created_at=created_date)
     
     return HttpResponseRedirect('/limbs/orders')
 
@@ -654,3 +703,27 @@ def add_item_order(request, pk):
             'supp_list': supp_list,
             'order_list':order_list,  
         })
+
+def interact_order(request, pk):
+
+    if request.method == 'POST':
+        form_data = request.POST
+        print(form_data)
+        if "Generate" in form_data.keys():
+            #TODO excel stuff
+            return HttpResponseRedirect('/limbs/orders')
+        elif "Complete" in form_data.keys():
+            order = Order.objects.get(id=pk)
+
+            tmp_order_loc = Location(name="TBD, Order: " + order.name)
+            tmp_order_loc.save() 
+            
+            item_orders = ItemOrder.objects.all().filter(order=order)
+            for io in item_orders:
+                new_item_qty = ItemQuantity(item=io.item, location=tmp_order_loc, quantity=io.quantity)
+                new_item_qty.save() 
+
+            order.completed = True
+            order.save() 
+            
+            return HttpResponseRedirect('/limbs/orders')

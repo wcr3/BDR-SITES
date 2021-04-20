@@ -1,5 +1,5 @@
 
-<form onsubmit="return validateForm(true, true, true)" action="{% url 'limbs:create_item' %}" method="post" id="create_item_form">
+<form onsubmit="return validateForm(true, true, true, true)" action="{% url 'limbs:create_item' %}" method="post" id="create_item_form">
     {% csrf_token %}
 </form>
 
@@ -18,20 +18,17 @@
 <datalist id="locations">
     {% for location in locations %}
         <option data-id="{{location.id}}" value="{{location}}">
-        <!-- {% if location.parent %}
-        <option data-id="{{location.id}}" value="{{location.name}}.{{location.parent}}">
-        {% else %}
-        <option data-id="{{location.id}}" value="{{location.name}}">
-        {% endif %} -->
     {% endfor %}
 </datalist>
 
-<div id="hidden_container"></div>
 <datalist id="tags">
     {% for tag in tags %}
         <option value="{{ tag.name}}">
     {% endfor %}
 </datalist>
+
+<div id="hidden_container"></div>
+
 
 <!-- <div style="grid-column: span 1; grid-column-start: 2; grid-row-start: 2; justify-items: center;"> -->
 
